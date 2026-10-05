@@ -6,11 +6,11 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M0 in progress.** Nothing in this repo is a result yet.
+Status: **M0 done (tag `m0`); M1 next.** Nothing in this repo is a result yet.
 
-> **Next session starts here:** M0 CI is green (run #1) and both spikes have recorded
-> outcomes; ADR-001/ADR-002 accepted. Open items are pb's: merge the M0 PR, tag `m0`, set
-> branch protection. Then M1 (pb authors the HARA).
+> **Next session starts here:** M0 is merged (PR #1), tagged `m0`, docs live on GitHub
+> Pages, ruleset on `main` active. Work continues on branch **`m1-hara`** (already created
+> locally). Start M1 with the plan in §8.
 
 ---
 
@@ -24,8 +24,8 @@ Status: **M0 in progress.** Nothing in this repo is a result yet.
 
 | M | Title | Status | Tag | Notes |
 |---|---|---|---|---|
-| M0 | Scaffold and feasibility spikes | in review | — | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
-| M1 | Item definition, HARA, safety goals | not started | — | **pb authors** all ratings; ADR-003 HARA scope |
+| M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
+| M1 | Item definition, HARA, safety goals | next | — | **pb authors** all ratings; ADR-003 HARA scope |
 | M2 | Requirements and safety concepts | not started | — | EARS lint, trace gate v1, decomposition ADR |
 | M3 | SysML v2 architecture | not started | — | |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
@@ -76,18 +76,20 @@ that remain.
 | E2E consecutive-error count (default 3) | M2 | open |
 | ASIL of `TgtSel` and the decomposition of `AccCtrl` / `AccMon` | M2 | open |
 
-## 6. Environment facts (checked 2026-09-29)
+## 6. Environment facts (checked 2026-09-29, updated 2026-10-06)
 
 - Host: Ubuntu 24.04, GCC 13.3, Python 3.12.3, Java 21, Docker 29.1 (user in `docker` group).
 - `vcan` kernel module present on the host (not loaded).
 - Not installed on host: cmake, cppcheck, jupyter, arm-none-eabi-gcc. All go into the
   Docker image (with GCC 14) instead.
-- Folder is not yet a git repository; M0 initialises it.
+- Git repository on GitHub: https://github.com/Prennoy99/safecruise (public). `main` is
+  protected by a ruleset; all work goes through a milestone branch and PR.
 - Docker's default bridge network on this host cannot reach GitHub release assets (TLS
   connect times out; host networking works). Build locally with
   `docker build --network=host`; the devcontainer already passes it. CI is unaffected.
-- GitHub CLI (`gh`) not installed: pb either installs and authenticates it
-  (`sudo apt install gh && gh auth login`) or creates the GitHub repo in the browser.
+- GitHub CLI (`gh`) not installed; pb does GitHub-side steps in the browser. CI step logs
+  need admin rights; without `gh`, results are read from the public API and the run's job
+  summary.
 
 ## 7. M0 checklist
 
@@ -97,7 +99,7 @@ Brief §12 M0, refined by ADR-000. Items marked **(pb)** need pb to act.
 - [x] `git init`, default branch `main`, work on branch `m0-scaffold` **(pb)**
 - [x] `.gitignore` (at least `build/`, Python caches, docs build output, coverage output)
 - [x] Public GitHub repo `safecruise` created **(pb)**, or via `gh` if authenticated;
-      branch protection on `main` with the six required checks **(pb)** — protection open
+      branch protection on `main` with the six required checks **(pb)** — ruleset active
 - [x] README skeleton with the "in progress — design and intent only, no results" banner
       and the non-goals from brief §2
 
@@ -150,3 +152,32 @@ the first run, add the six jobs as required checks on `main`.
 
 **Done when:** CI is green; `sphinx-build` produces HTML and `needs.json`; ADR-001 and
 ADR-002 are recorded; evidence is in the M0 PR; pb merges and tags `m0`.
+
+M0 closed 2026-10-06: PR #1 merged as `740627e`, tagged `m0`, `main` CI green, Pages live
+at https://prennoy99.github.io/safecruise/, ruleset on `main` (PR required, six checks,
+no force push, no deletion).
+
+## 8. M1 plan
+
+Brief §12 M1, refined by ADR-000 D-04, D-05, D-17. Branch `m1-hara`. Items marked **(pb)**
+are pb's alone; the rest is drafting that pb reviews.
+
+- [ ] PLAN.md: M1 in progress (first commit on the branch)
+- [ ] `00_item_definition.rst`: function, item boundary (brief §4.1), interfaces,
+      operating modes, legal and functional constraints, known limitations; controllability
+      depends on the D-04 assumptions (TOR display, actuator execution, brake-signal
+      integrity, radar plausibility). Drafted, pb reviews
+- [ ] **ADR-003** HARA scope: 5 operational situations × 4 malfunctions (D-05). Pruning of
+      non-meaningful cells is proposed with one-line reasons; **pb decides**
+- [ ] `01_hara.rst` template: one row per hazardous event with `⟨pb: …⟩` for S, E, C, the
+      rationale of each rating and the ASIL
+- [ ] `02_safety_goals.rst` template: `SG_` needs with `⟨pb: …⟩` for ASIL, safe state
+      (initial proposal brief §5.4) and FTTI (initial; revisited after the M4 experiment)
+- [ ] ASIL check test: every ASIL matches the S/E/C risk table; fails while any
+      `⟨pb: …⟩` remains
+- [ ] **(pb)** all S/E/C ratings with rationale, ASILs, safe states, FTTIs
+- [ ] Review pass: arithmetic, duplicate or missing hazardous events, weak rationale
+
+**Done when:** `01_hara.rst` and `02_safety_goals.rst` build; every hazardous event has
+S/E/C with rationale; every ASIL matches the risk table (test); each safety goal has a safe
+state and FTTI; ADR-003 recorded; CI green; pb merges and tags `m1`.
