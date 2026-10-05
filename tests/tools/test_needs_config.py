@@ -1,4 +1,4 @@
-"""Checks the sphinx-needs configuration in docs/conf.py (brief §6.1, ADR-000).
+"""Checks the sphinx-needs configuration in docs/conf.py (brief §6.1, ADR-000, ADR-004).
 
 Builds a throw-away Sphinx project that uses the real conf.py and one need of every type,
 then reads back needs.json. The example needs are fixtures, not project requirements.
@@ -18,9 +18,23 @@ FIXTURE_RST = """
 Fixture
 =======
 
+.. he:: Fixture hazardous event
+   :id: HE_FIX_1
+   :status: draft
+   :situation: OS1
+   :malfunction: M1
+   :severity: ⟨pb⟩
+   :severity_rationale: ⟨pb⟩
+   :exposure: ⟨pb⟩
+   :exposure_rationale: ⟨pb⟩
+   :controllability: ⟨pb⟩
+   :controllability_rationale: ⟨pb⟩
+   :asil: ⟨pb⟩
+
 .. sg:: Fixture safety goal
    :id: SG_FIX_1
    :status: draft
+   :derives_from: HE_FIX_1
    :asil: ⟨pb⟩
    :safe_state: ⟨pb⟩
    :ftti_ms: ⟨pb⟩
@@ -93,11 +107,13 @@ def test_every_need_type_and_link_type_exports_to_needs_json(srcdir: Path, tmp_p
     data = json.loads((tmp_path / "out" / "needs.json").read_text(encoding="utf-8"))
     needs = data["versions"][data["current_version"]]["needs"]
 
-    expected_types = {"STK", "SG", "SYS", "FSR", "TSR", "AOU", "SWR", "ARC", "TC"}
+    expected_types = {"STK", "HE", "SG", "SYS", "FSR", "TSR", "AOU", "SWR", "ARC", "TC"}
     assert {nid.split("_")[0] for nid in needs} == expected_types
     assert {n["type"] for n in needs.values()} == {t.lower() for t in expected_types}
 
     assert needs["SG_FIX_1"]["safe_state"] == "⟨pb⟩"
+    assert needs["HE_FIX_1"]["controllability_rationale"] == "⟨pb⟩"
+    assert needs["HE_FIX_1"]["derives_from_back"] == ["SG_FIX_1"]
     assert needs["TC_FIX_1"]["verifies"] == ["SYS_FIX_1", "SWR_FIX_1"]
     assert needs["TC_FIX_1"]["level"] == "mil, sil"
     assert needs["TSR_FIX_1"]["allocated_to"] == ["ARC_FIX_1"]

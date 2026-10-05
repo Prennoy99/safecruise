@@ -6,11 +6,11 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M0 done (tag `m0`); M1 next.** Nothing in this repo is a result yet.
+Status: **M1 in progress** on branch `m1-hara`. Nothing in this repo is a result yet.
 
-> **Next session starts here:** M0 is merged (PR #1), tagged `m0`, docs live on GitHub
-> Pages, ruleset on `main` active. Work continues on branch **`m1-hara`** (already created
-> locally). Start M1 with the plan in §8.
+> **Next session starts here:** M1 content is complete and `tools/hara_check.py` passes.
+> Left: pb reviews and sets `status: approved` on the hazardous events and safety goals,
+> pushes, and opens the M1 PR once CI is green.
 
 ---
 
@@ -25,7 +25,7 @@ Status: **M0 done (tag `m0`); M1 next.** Nothing in this repo is a result yet.
 | M | Title | Status | Tag | Notes |
 |---|---|---|---|---|
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
-| M1 | Item definition, HARA, safety goals | next | — | **pb authors** all ratings; ADR-003 HARA scope |
+| M1 | Item definition, HARA, safety goals | in progress | — | **pb authors** all ratings; ADR-003 HARA scope |
 | M2 | Requirements and safety concepts | not started | — | EARS lint, trace gate v1, decomposition ADR |
 | M3 | SysML v2 architecture | not started | — | |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
@@ -67,8 +67,8 @@ that remain.
 
 | Value | Needed by | Status |
 |---|---|---|
-| S/E/C ratings with rationale, ASIL per hazardous event | M1 | open |
-| Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | open |
+| S/E/C ratings with rationale, ASIL per hazardous event | M1 | agreed, approval open |
+| Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | agreed, approval open |
 | FTTI hazard criterion and assumed FTTI (before the MIL run) | M4 | open |
 | TTC threshold for checker rule 2 | M2 | open |
 | `AccMon` block hold time `T_hold` | M2 | open |
@@ -162,21 +162,35 @@ no force push, no deletion).
 Brief §12 M1, refined by ADR-000 D-04, D-05, D-17. Branch `m1-hara`. Items marked **(pb)**
 are pb's alone; the rest is drafting that pb reviews.
 
-- [ ] PLAN.md: M1 in progress (first commit on the branch)
-- [ ] `00_item_definition.rst`: function, item boundary (brief §4.1), interfaces,
+- [x] PLAN.md: M1 in progress (first commit on the branch)
+- [x] `00_item_definition.rst`: function, item boundary (brief §4.1), interfaces,
       operating modes, legal and functional constraints, known limitations; controllability
       depends on the D-04 assumptions (TOR display, actuator execution, brake-signal
-      integrity, radar plausibility). Drafted, pb reviews
-- [ ] **ADR-003** HARA scope: 5 operational situations × 4 malfunctions (D-05). Pruning of
-      non-meaningful cells is proposed with one-line reasons; **pb decides**
-- [ ] `01_hara.rst` template: one row per hazardous event with `⟨pb: …⟩` for S, E, C, the
-      rationale of each rating and the ASIL
-- [ ] `02_safety_goals.rst` template: `SG_` needs with `⟨pb: …⟩` for ASIL, safe state
-      (initial proposal brief §5.4) and FTTI (initial; revisited after the M4 experiment)
-- [ ] ASIL check test: every ASIL matches the S/E/C risk table; fails while any
-      `⟨pb: …⟩` remains
-- [ ] **(pb)** all S/E/C ratings with rationale, ASILs, safe states, FTTIs
-- [ ] Review pass: arithmetic, duplicate or missing hazardous events, weak rationale
+      integrity, radar plausibility). Drafted; **pb reviews**
+- [x] **ADR-003** HARA scope, accepted by pb: OS1 × M3 pruned; M3 widened to cover
+      insufficient deceleration and wrong mode display; unintended activation within
+      M1/M2; actuator capability (+3 / −8 m/s²) assumed, no actuator limit credited
+- [x] **ADR-004** accepted: hazardous events as `HE_` needs, safety goals link to them,
+      `tools/hara_check.py` checks them; runs in `docs-trace-gate`
+- [x] `01_hara.rst` template: 19 hazardous events with `⟨pb: …⟩` for S, E, C, the
+      rationale of each rating and the ASIL; HARA conventions decided by pb (malfunction
+      magnitude, driver, exposure basis, severity guide)
+- [x] `02_safety_goals.rst`: `SG_ACC_001`–`004` (one per malfunction), wording agreed,
+      with `⟨pb: …⟩` for ASIL, safe state (per goal) and FTTI (initial; revisited after
+      the M4 experiment)
+- [x] ASIL check: `tools/hara_check.py` + `tests/tools/test_hara_check.py`; every ASIL
+      matches the S/E/C risk table; fails while any `⟨pb: …⟩` remains (CI step, ADR-004)
+- [x] All S/E/C ratings with rationale, ASILs; safe states, FTTIs (agreed by pb).
+      Goals: `SG_ACC_001` B / 1000 ms, `002` C / 500 ms, `003` B / 1000 ms,
+      `004` B / 500 ms
+- [x] Review pass: arithmetic checked by `hara_check.py`; worked numbers in the reasons
+      recomputed; no duplicate cells. Most sensitive ratings: `HE_OS2_M2` C3 (rests on the
+      −8 m/s² magnitude; C2 with an actuator limit, which would make `SG_ACC_002` B) and
+      `HE_OS5_M3` E3 (E4 with daily queue commuting, giving ASIL A)
+- [ ] **(pb)** review and set `status: approved` on every `HE_` and `SG_`
+
+The HARA check step in `docs-trace-gate` fails on any value still open; its job summary
+lists them.
 
 **Done when:** `01_hara.rst` and `02_safety_goals.rst` build; every hazardous event has
 S/E/C with rationale; every ASIL matches the risk table (test); each safety goal has a safe
