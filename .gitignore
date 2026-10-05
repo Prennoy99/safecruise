@@ -1,0 +1,29 @@
+# Build output (generated code included, ADR-000 D-19)
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Docs build output
+docs/_build/
+
+# Coverage and test reports
+*.gcda
+*.gcno
+*.gcov
+coverage/
+.coverage
+reports/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

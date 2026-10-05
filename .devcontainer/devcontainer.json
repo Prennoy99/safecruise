@@ -1,0 +1,30 @@
+{
+  "name": "SafeCruise",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": "..",
+    // Host networking: the default bridge network on some hosts cannot reach GitHub release
+    // assets during the build. Also needed later for vcan (ADR-000 D-20).
+    "options": ["--network=host"]
+  },
+  "runArgs": ["--network=host"],
+  "workspaceFolder": "/work",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/work,type=bind",
+  "remoteUser": "ubuntu",
+  "updateRemoteUserUID": true,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "lextudio.restructuredtext"
+      ],
+      "settings": {
+        "cmake.useCMakePresets": "always",
+        "python.defaultInterpreterPath": "/opt/venv/bin/python"
+      }
+    }
+  }
+}
