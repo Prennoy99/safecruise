@@ -1,0 +1,192 @@
+name: ci
+
+on:
+  push:
+    branches: [main, "m[0-9]*-*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Builds the toolchain image once per run; every other job uses it by digest (ADR-000 D-20).
+  image:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      ref: ${{ steps.ref.outputs.ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: name
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/safecruise-ci" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.name.outputs.image }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - id: ref
+        run: echo "ref=${{ steps.name.outputs.image }}@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+      - run: echo "Toolchain image \`${{ steps.ref.outputs.ref }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  build-unit:
+    needs: image
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.image.outputs.ref }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Toolchain versions
+        run: tools/toolchain_versions.sh | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Configure
+        run: cmake --preset gcc14
+      - name: Build
+        run: cmake --build --preset gcc14
+      - name: C unit tests (Unity via CTest)
+        run: ctest --preset gcc14 --output-junit "$GITHUB_WORKSPACE/reports/ctest.xml"
+      - name: Python tests
+        run: pytest --junitxml=reports/pytest.xml
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: junit-build-unit
+          path: reports/
+
+  static-analysis:
+    needs: image
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.image.outputs.ref }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: ruff
+        run: ruff check . && ruff format --check .
+      - name: clang-format
+        run: find swc bsw platform tests/unit_c -name '*.[ch]' -print0 | xargs -0 -r clang-format --dry-run -Werror
+      # Report only: brief §8 gates on zero findings and CCN <= 10 for safety-relevant code
+      # (AccMon, E2E), which arrives in M5. Coverage also arrives in M5.
+      - name: cppcheck + MISRA addon (report)
+        run: cppcheck --addon=misra --enable=style --std=c99 --inline-suppr swc bsw platform
+      - name: lizard complexity (report)
+        run: lizard swc bsw platform
+
+  mil:
+    needs: image
+    runs-on: ubuntu-24.04
+    steps:
+      - run: 'echo "Placeholder: MIL scenarios arrive in M4."'
+
+  sil-lib:
+    needs: image
+    runs-on: ubuntu-24.04
+    steps:
+      - run: 'echo "Placeholder: SIL-lib and back-to-back arrive in M6."'
+
+  # Spike 2 (ADR-002): can the runner load vcan, and can the container use it via host networking?
+  sil-vecu:
+    needs: image
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Spike 2: load vcan on the runner"
+        id: vcan
+        continue-on-error: true
+        run: |
+          uname -r
+          sudo modprobe vcan || {
+            sudo apt-get update -q
+            sudo apt-get install -y -q "linux-modules-extra-$(uname -r)"
+            sudo modprobe vcan
+          }
+          sudo ip link add dev vcan0 type vcan
+          sudo ip link set up vcan0
+          ip -details link show vcan0
+      - name: "Spike 2: CAN round trip from the container (--network=host)"
+        id: roundtrip
+        if: steps.vcan.outcome == 'success'
+        continue-on-error: true
+        run: |
+          docker run --rm --network=host -v "$PWD":/work -w /work \
+            "${{ needs.image.outputs.ref }}" python tools/spikes/vcan_roundtrip.py vcan0
+      - name: Spike 2 outcome
+        if: always()
+        run: |
+          {
+            echo "### Spike 2 (ADR-002)"
+            echo "- runner kernel: \`$(uname -r)\`"
+            echo "- vcan on runner: **${{ steps.vcan.outcome }}**"
+            echo "- round trip from container: **${{ steps.roundtrip.outcome || 'skipped' }}**"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+  docs-trace-gate:
+    needs: image
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.image.outputs.ref }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Docs (HTML)
+        run: sphinx-build -b html -W --keep-going docs build/docs/html
+      - name: Requirements export (needs.json)
+        run: |
+          sphinx-build -b needs -W --keep-going docs build/docs/needs
+          test -s build/docs/needs/needs.json
+          cp build/docs/needs/needs.json build/docs/html/needs.json
+      - name: "Spike 1 (ADR-001): SysML v2 toy model parses"
+        run: python tools/sysml_parse.py model/sysml/spike/Toy.sysml
+      - name: "Spike 1 (ADR-001): broken models fail"
+        run: |
+          for f in tests/tools/fixtures/broken_syntax.sysml tests/tools/fixtures/broken_reference.sysml; do
+            if python tools/sysml_parse.py "$f"; then echo "::error::$f parsed but must fail"; exit 1; fi
+          done
+      - name: Trace gate
+        run: 'echo "Placeholder: tools/trace_check.py arrives in M2."'
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: build/docs/html
+
+  pages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-unit, static-analysis, mil, sil-lib, sil-vecu, docs-trace-gate]
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

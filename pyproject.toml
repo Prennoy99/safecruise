@@ -1,0 +1,43 @@
+[project]
+name = "safecruise"
+version = "0.0.0"
+description = "Adaptive Cruise Control taken through the automotive V-model (applied concepts, not certified)."
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+    # Requirements database and docs
+    "sphinx>=8,<9",
+    "sphinx-needs>=5,<7",
+    "sphinx-test-reports>=1.1",
+    "myst-parser>=4",
+    # CAN
+    "cantools>=40",
+    "python-can>=4.4",
+    # Models, harness, plots
+    "numpy>=2.1",
+    "matplotlib>=3.9",
+    "pyyaml>=6",
+    # Test and quality tools
+    "pytest>=8.3",
+    "ruff>=0.8",
+    "lizard>=1.17",
+    "gcovr>=8",
+    # Headless SysML v2 kernel driver (the kernel itself is installed in the image)
+    "jupyter-client>=8.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+junit_family = "xunit1"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
