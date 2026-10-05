@@ -8,9 +8,9 @@ decisions that refine or change the brief are recorded as ADRs in
 
 Status: **M0 in progress.** Nothing in this repo is a result yet.
 
-> **Next session starts here:** M0 scaffold is written and passes locally in the toolchain
-> image. Open items are pb's (git init, GitHub repo, first CI run, branch protection); then
-> fill the CI evidence into ADR-001/ADR-002 and open the M0 PR. See §7.
+> **Next session starts here:** M0 CI is green (run #1) and both spikes have recorded
+> outcomes. Open items are pb's: accept ADR-001/ADR-002, merge the M0 PR, tag `m0`, set
+> branch protection. Then M1 (pb authors the HARA).
 
 ---
 
@@ -24,7 +24,7 @@ Status: **M0 in progress.** Nothing in this repo is a result yet.
 
 | M | Title | Status | Tag | Notes |
 |---|---|---|---|---|
-| M0 | Scaffold and feasibility spikes | in progress | — | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
+| M0 | Scaffold and feasibility spikes | in review | — | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
 | M1 | Item definition, HARA, safety goals | not started | — | **pb authors** all ratings; ADR-003 HARA scope |
 | M2 | Requirements and safety concepts | not started | — | EARS lint, trace gate v1, decomposition ADR |
 | M3 | SysML v2 architecture | not started | — | |
@@ -94,10 +94,10 @@ that remain.
 Brief §12 M0, refined by ADR-000. Items marked **(pb)** need pb to act.
 
 **Repository**
-- [ ] `git init`, default branch `main`, work on branch `m0-scaffold` **(pb)**
+- [x] `git init`, default branch `main`, work on branch `m0-scaffold` **(pb)**
 - [x] `.gitignore` (at least `build/`, Python caches, docs build output, coverage output)
-- [ ] Public GitHub repo `safecruise` created **(pb)**, or via `gh` if authenticated;
-      branch protection on `main` with the six required checks **(pb)**
+- [x] Public GitHub repo `safecruise` created **(pb)**, or via `gh` if authenticated;
+      branch protection on `main` with the six required checks **(pb)** — protection open
 - [x] README skeleton with the "in progress — design and intent only, no results" banner
       and the non-goals from brief §2
 
@@ -108,8 +108,8 @@ Brief §12 M0, refined by ADR-000. Items marked **(pb)** need pb to act.
 - [x] `pyproject.toml` with locked dependencies (sphinx, sphinx-needs,
       sphinx-test-reports, cantools, python-can, numpy, matplotlib, pytest, ruff, pyyaml)
       — `uv.lock`; also myst-parser (Markdown ADRs in the docs), lizard, gcovr, jupyter-client
-- [ ] Image built in CI and referenced by digest — workflow written (`image` job pushes to
-      GHCR, other jobs use `image@digest`); awaiting first CI run
+- [x] Image built in CI and referenced by digest — `image` job pushes to GHCR, other jobs
+      use `image@digest` (run #1)
 
 **Build and tests**
 - [x] `CMakeLists.txt` + `CMakePresets.json` pinned to GCC 14; warnings
@@ -127,11 +127,10 @@ Brief §12 M0, refined by ADR-000. Items marked **(pb)** need pb to act.
 - [x] `sphinx-build -b needs` produces `needs.json`; HTML builds
 
 **Spikes**
-- [ ] Spike 1: SysML v2 Pilot parses a toy model in CI → **ADR-001** (fallback: text-level
-      ID check in CI) — works locally in the image; ADR-001 proposed, CI evidence pending
-- [ ] Spike 2: `vcan` on the GitHub Actions runner + container with `--network=host` →
-      **ADR-002** (fallback: UDP CanIf backend in CI) — spike job written, decision rule set
-      in ADR-002 before the run; outcome pending first CI run
+- [x] Spike 1: SysML v2 Pilot parses a toy model in CI → **ADR-001** (fallback: text-level
+      ID check in CI) — parses in CI; fallback not needed
+- [x] Spike 2: `vcan` on the GitHub Actions runner + container with `--network=host` →
+      **ADR-002** (fallback: UDP CanIf backend in CI) — works in CI; vcan chosen
 
 **CI**
 - [x] `.github/workflows/ci.yml` with jobs `build-unit`, `static-analysis`, `mil`,

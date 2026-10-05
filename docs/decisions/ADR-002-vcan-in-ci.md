@@ -1,6 +1,6 @@
 # ADR-002 — Virtual CAN in CI (Spike 2)
 
-- **Status:** proposed — outcome pending the first CI run
+- **Status:** proposed — outcome recorded (option 1); awaiting pb's acceptance
 - **Date:** 2026-10-05
 - **Decided by:** pb (pending)
 - **Relates to:** brief §12 M0 (Spike 2), §7.4 (SIL-vECU), [ADR-000](ADR-000-project-setup.md) D-02, D-07, D-20
@@ -44,14 +44,31 @@ Spike 2 runs in the `sil-vecu` job of `.github/workflows/ci.yml`:
   unchanged within 1 s.
 
 Both steps are `continue-on-error` so the spike records its outcome in the job summary
-without blocking the pipeline.
+without blocking the pipeline. The job conclusion is therefore not the evidence; the
+recorded step outcomes are.
 
-**CI evidence:** ⟨to be added from the first CI run: runner kernel version, outcome of both
-steps, link to the `sil-vecu` job⟩
+**CI evidence:** [run #1](https://github.com/Prennoy99/safecruise/actions/runs/37376630395), commit `743bb87`, job
+[`sil-vecu`](https://github.com/Prennoy99/safecruise/actions/runs/37376630395/job/111988530325), job summary "Spike 2 (ADR-002)":
+
+| Item | Result |
+|---|---|
+| Runner kernel | `6.17.0-1022-azure` (`ubuntu-24.04` runner) |
+| vcan on runner (step outcome) | success |
+| Round trip from container, `--network=host` (step outcome) | success |
+
+The job raised no error annotations, which agrees with both outcomes. Not recorded: whether
+`modprobe vcan` worked directly or needed the `linux-modules-extra` fallback. The step log
+shows it; it does not change the decision.
 
 **Local evidence:** not run. It needs `sudo modprobe vcan` on the host (pb), after which
 `docker run --rm --network=host -v "$PWD":/work safecruise-dev python tools/spikes/vcan_roundtrip.py vcan0`
 repeats the round trip. Optional; the CI result decides.
+
+## Outcome
+
+Both conditions of the decision rule hold, so **option 1** applies: CI uses `vcan0` on the
+runner with the container on the host network. The `udp` CanIf backend stays a local
+fallback and the interface that keeps it possible (ADR-000 D-07) stays.
 
 ## Consequences
 

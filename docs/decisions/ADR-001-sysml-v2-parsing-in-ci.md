@@ -1,6 +1,6 @@
 # ADR-001 — SysML v2 model parsing in CI (Spike 1)
 
-- **Status:** proposed — local evidence recorded; CI evidence pending the first CI run
+- **Status:** proposed — local and CI evidence recorded; awaiting pb's acceptance
 - **Date:** 2026-10-05
 - **Decided by:** pb (pending)
 - **Relates to:** brief §12 M0 (Spike 1), §3 (MBSE), [ADR-000](ADR-000-project-setup.md) D-02, D-20
@@ -27,12 +27,12 @@ unknown. If it does not, ADR-000 D-02 trims to a text-level ID check.
 
 ## Decision
 
-Option 1, pending CI confirmation. The kernel `jupyter-sysml-kernel=0.62.0` (conda-forge,
+Option 1. The kernel `jupyter-sysml-kernel=0.62.0` (conda-forge,
 matching the 2026-08 Pilot release) is installed in the toolchain image under
 `/opt/sysml` with micromamba. `tools/sysml_parse.py` drives it.
 
-If the first CI run of `docs-trace-gate` fails the Spike 1 steps for a reason that cannot
-be fixed in the image, switch to option 4 and amend this ADR.
+The option 4 fallback is not needed. If a later kernel or runner change breaks parsing in
+a way that cannot be fixed in the image, switch to option 4 and amend this ADR.
 
 ## Evidence
 
@@ -63,7 +63,17 @@ transitions, `exhibit state`, a requirement def with a short ID (`<'SYS_TOY_001'
 `satisfy`. Both kinds of error (syntax, unresolved reference) are reported.
 `tests/tools/test_sysml_parse.py` repeats these three checks under pytest.
 
-**CI evidence:** ⟨to be added from the first CI run: link to the `docs-trace-gate` job⟩
+**CI evidence:** [run #1](https://github.com/Prennoy99/safecruise/actions/runs/37376630395), commit `743bb87`, job
+[`docs-trace-gate`](https://github.com/Prennoy99/safecruise/actions/runs/37376630395/job/111988530345), image `ghcr.io/prennoy99/safecruise-ci@sha256:61e674ec3e5fab215301376f115884d140eac50f6dfe9315f0da4d5ae7716f4f`:
+
+| Step | Result |
+|---|---|
+| Spike 1 (ADR-001): SysML v2 toy model parses | success |
+| Spike 1 (ADR-001): broken models fail (both fixtures rejected) | success |
+
+Neither step uses `continue-on-error`, so a success is a real pass. The same run's
+`build-unit` job also passed `tests/tools/test_sysml_parse.py`. Job runtime 1 min 2 s,
+including the docs builds.
 
 ## Consequences
 
