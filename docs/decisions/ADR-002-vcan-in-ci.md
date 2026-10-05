@@ -1,8 +1,8 @@
 # ADR-002 — Virtual CAN in CI (Spike 2)
 
-- **Status:** proposed — outcome recorded (option 1); awaiting pb's acceptance
-- **Date:** 2026-10-05
-- **Decided by:** pb (pending)
+- **Status:** accepted (option 1: vcan in CI)
+- **Date:** 2026-10-05 (proposed), 2026-10-06 (accepted)
+- **Decided by:** pb
 - **Relates to:** brief §12 M0 (Spike 2), §7.4 (SIL-vECU), [ADR-000](ADR-000-project-setup.md) D-02, D-07, D-20
 
 ## Context

@@ -1,8 +1,8 @@
 # ADR-001 — SysML v2 model parsing in CI (Spike 1)
 
-- **Status:** proposed — local and CI evidence recorded; awaiting pb's acceptance
-- **Date:** 2026-10-05
-- **Decided by:** pb (pending)
+- **Status:** accepted
+- **Date:** 2026-10-05 (proposed), 2026-10-06 (accepted)
+- **Decided by:** pb
 - **Relates to:** brief §12 M0 (Spike 1), §3 (MBSE), [ADR-000](ADR-000-project-setup.md) D-02, D-20
 
 ## Context

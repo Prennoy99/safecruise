@@ -9,7 +9,7 @@ decisions that refine or change the brief are recorded as ADRs in
 Status: **M0 in progress.** Nothing in this repo is a result yet.
 
 > **Next session starts here:** M0 CI is green (run #1) and both spikes have recorded
-> outcomes. Open items are pb's: accept ADR-001/ADR-002, merge the M0 PR, tag `m0`, set
+> outcomes; ADR-001/ADR-002 accepted. Open items are pb's: merge the M0 PR, tag `m0`, set
 > branch protection. Then M1 (pb authors the HARA).
 
 ---
