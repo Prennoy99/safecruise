@@ -6,11 +6,10 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M1 in progress** on branch `m1-hara`. Nothing in this repo is a result yet.
+Status: **M1 in review** (branch `m1-hara`). Nothing in this repo is a result yet.
 
-> **Next session starts here:** M1 content is complete and `tools/hara_check.py` passes.
-> Left: pb reviews and sets `status: approved` on the hazardous events and safety goals,
-> pushes, and opens the M1 PR once CI is green.
+> **Next session starts here:** M1 is complete and approved; the PR waits for pb's merge
+> and the `m1` tag. Then M2 (requirements and safety concepts) starts on `m2-requirements`.
 
 ---
 
@@ -25,7 +24,7 @@ Status: **M1 in progress** on branch `m1-hara`. Nothing in this repo is a result
 | M | Title | Status | Tag | Notes |
 |---|---|---|---|---|
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
-| M1 | Item definition, HARA, safety goals | in progress | — | **pb authors** all ratings; ADR-003 HARA scope |
+| M1 | Item definition, HARA, safety goals | in review | — | **pb authors** all ratings; ADR-003 HARA scope |
 | M2 | Requirements and safety concepts | not started | — | EARS lint, trace gate v1, decomposition ADR |
 | M3 | SysML v2 architecture | not started | — | |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
@@ -187,10 +186,11 @@ are pb's alone; the rest is drafting that pb reviews.
       recomputed; no duplicate cells. Most sensitive ratings: `HE_OS2_M2` C3 (rests on the
       −8 m/s² magnitude; C2 with an actuator limit, which would make `SG_ACC_002` B) and
       `HE_OS5_M3` E3 (E4 with daily queue commuting, giving ASIL A)
-- [ ] **(pb)** review and set `status: approved` on every `HE_` and `SG_`
+- [x] **(pb)** review and set `status: approved` on every `HE_` and `SG_`
 
 The HARA check step in `docs-trace-gate` fails on any value still open; its job summary
-lists them.
+lists them. The step runs under `shell: bash`: the container's default `sh` has no
+`pipefail`, which failed the first M1 CI run before the check ran.
 
 **Done when:** `01_hara.rst` and `02_safety_goals.rst` build; every hazardous event has
 S/E/C with rationale; every ASIL matches the risk table (test); each safety goal has a safe
