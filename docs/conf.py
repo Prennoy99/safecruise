@@ -9,6 +9,7 @@ copyright = "2026, pb"
 
 extensions = [
     "myst_parser",
+    "sphinx.ext.graphviz",
     "sphinx_needs",
     "sphinxcontrib.test_reports",
 ]
@@ -84,3 +85,7 @@ needs_extra_links = [
 
 # needs.json is written by `sphinx-build -b needs` and, for the published site, by HTML builds.
 needs_build_json = True
+
+# Trace diagrams (needflow) are drawn with Graphviz `dot` from the toolchain image (ADR-005).
+needs_flow_engine = "graphviz"
+graphviz_output_format = "svg"

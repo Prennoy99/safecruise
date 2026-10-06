@@ -6,10 +6,14 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M1 in review** (branch `m1-hara`). Nothing in this repo is a result yet.
+Status: **M1 done (tag `m1`); M2 in progress** on branch `m2-requirements`. Nothing in
+this repo is a result yet.
 
-> **Next session starts here:** M1 is complete and approved; the PR waits for pb's merge
-> and the `m1` tag. Then M2 (requirements and safety concepts) starts on `m2-requirements`.
+> **Next session starts here:** M2 on branch `m2-requirements`, plan in §9. Tooling is done
+> (EARS lint, trace gate v1, Graphviz; ADR-005 proposed). Next: requirements top-down
+> (`03` system, `07` minimal `ARC_`, `04` FSC with `AOU_`, `05` TSC), ADR-006
+> decomposition, ADR-007 black channel, and proposals for the M2 values in §5. The trace
+> gate fails until every safety goal has FSRs; that is the open to-do, not a defect.
 
 ---
 
@@ -24,8 +28,8 @@ Status: **M1 in review** (branch `m1-hara`). Nothing in this repo is a result ye
 | M | Title | Status | Tag | Notes |
 |---|---|---|---|---|
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
-| M1 | Item definition, HARA, safety goals | in review | — | **pb authors** all ratings; ADR-003 HARA scope |
-| M2 | Requirements and safety concepts | not started | — | EARS lint, trace gate v1, decomposition ADR |
+| M1 | Item definition, HARA, safety goals | done | `m1` | 19 hazardous events, 4 safety goals (B / C / B / B); ADR-003, ADR-004 |
+| M2 | Requirements and safety concepts | in progress | — | EARS lint, trace gate v1, decomposition ADR |
 | M3 | SysML v2 architecture | not started | — | |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
 | M5 | Software requirements and embedded C | not started | — | |
@@ -66,14 +70,16 @@ that remain.
 
 | Value | Needed by | Status |
 |---|---|---|
-| S/E/C ratings with rationale, ASIL per hazardous event | M1 | agreed, approval open |
-| Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | agreed, approval open |
+| S/E/C ratings with rationale, ASIL per hazardous event | M1 | done (approved) |
+| Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | done (approved) |
 | FTTI hazard criterion and assumed FTTI (before the MIL run) | M4 | open |
 | TTC threshold for checker rule 2 | M2 | open |
 | `AccMon` block hold time `T_hold` | M2 | open |
 | Plausibility jump limits (checker rule 4) | M2 | open |
 | E2E consecutive-error count (default 3) | M2 | open |
 | ASIL of `TgtSel` and the decomposition of `AccCtrl` / `AccMon` | M2 | open |
+| Tolerance between requested and measured acceleration (detects too little deceleration, ADR-003) | M2 | open |
+| TOR display latency (cluster assumption of use) | M2 | open |
 
 ## 6. Environment facts (checked 2026-09-29, updated 2026-10-06)
 
@@ -195,3 +201,53 @@ lists them. The step runs under `shell: bash`: the container's default `sh` has 
 **Done when:** `01_hara.rst` and `02_safety_goals.rst` build; every hazardous event has
 S/E/C with rationale; every ASIL matches the risk table (test); each safety goal has a safe
 state and FTTI; ADR-003 recorded; CI green; pb merges and tags `m1`.
+
+M1 closed 2026-10-06: PR #2 merged as `775823e`, tagged `m1`. CI run 37511023867 green on
+`1927d40` (the PR page showed `docs-trace-gate` as running after it had finished; a
+display issue only).
+
+**Carried into M2 from ADR-003:** an FSR that detects too little deceleration (requested
+against measured acceleration); an argument that unintended braking within A-05 is
+controllable; the cluster raising the TOR on an ACC message timeout as an `AOU_`.
+
+## 9. M2 plan
+
+Brief §12 M2, refined by ADR-000 D-06, D-10, D-13, D-15, D-16, D-17, D-19 and ADR-003.
+Branch `m2-requirements`. Items marked **(pb)** are pb's alone.
+
+**Tooling**
+- [x] PLAN.md: close M1, M2 plan (first commit on the branch)
+- [x] Graphviz in the image; sphinx-needs `needflow` rendered with Graphviz
+- [x] `tools/ears_lint.py` + tests, in `docs-trace-gate`: one EARS template and exactly
+      one "shall"; no vague words; a number with a unit where a value is stated; required
+      attributes per type; ID prefix matches the directive (M0 note); fails on any
+      `⟨pb: …⟩`
+- [x] `tools/trace_check.py` v1 + tests, in `docs-trace-gate`: every `SG_` has an `FSR_`,
+      every `FSR_` a `TSR_`, every `TSR_` an allocation; no dangling links. Test-related
+      rules and `draft` at ASIL ≥ A are warnings until M6
+- [x] **ADR-005** (proposed) EARS lint and trace gate v1 rules; also ASIL inheritance
+      and the allowed link types
+
+**Requirements**
+- [ ] `03_stakeholder_and_system_requirements.rst`: `STK_` needs; `SYS_` in EARS for modes
+      and transitions (D-11, D-13), HMI, speed and gap control, override, TOR, limits
+- [ ] `07_architecture.rst`: minimal `ARC_` elements (`Hmi`, `TgtSel`, `AccCtrl`, `AccMon`,
+      RTE, COM, E2E, CanIf, scheduler) as allocation targets; M3 adds the SysML model
+- [ ] `04_functional_safety_concept.rst`: `FSR_` per safety goal with ASIL, safe state and
+      timing within the FTTI; `AOU_` for TOR display, cluster TOR on timeout, actuator
+      execution, brake-signal integrity, radar plausibility, radar moving objects only,
+      receiver-side E2E check of `ACC_Cmd`; `needflow` per safety goal
+- [ ] `05_technical_safety_concept.rst`: `TSR_` allocated to `ARC_` elements or covered by
+      `AOU_`; detection and reaction time budget against each FTTI; `needflow` from each
+      safety goal down to the TSRs
+- [ ] **ADR-006** ASIL decomposition of `AccCtrl` / `AccMon` and the ASIL of `TgtSel`, with
+      the independence argument and its limitations (one ECU, shared radar input)
+- [ ] **ADR-007** COM and CanIf as QM under the black-channel argument (D-19)
+
+**pb**
+- [ ] **(pb)** values in §5 marked M2 (proposed with reasoning, written in by pb)
+- [ ] **(pb)** set `status: approved` on all requirements with ASIL ≥ A
+
+**Done when:** EARS lint passes on all requirements; no dangling links; `needflow` diagrams
+render from each safety goal down to the TSRs; the decomposition ADR records the
+independence argument and its limitations; CI green; pb merges and tags `m2`.

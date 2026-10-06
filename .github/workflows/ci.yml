@@ -171,10 +171,27 @@ jobs:
           for f in tests/tools/fixtures/broken_syntax.sysml tests/tools/fixtures/broken_reference.sysml; do
             if python tools/sysml_parse.py "$f"; then echo "::error::$f parsed but must fail"; exit 1; fi
           done
-      - name: Trace gate
-        run: 'echo "Placeholder: tools/trace_check.py arrives in M2."'
+      # EARS lint and trace gate v1 (ADR-005); the trace gate becomes --strict in M6.
+      - name: EARS lint (ADR-005)
+        shell: bash
+        run: |
+          { echo '### EARS lint'; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          status=0
+          python tools/ears_lint.py build/docs/needs/needs.json | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+      - name: Trace gate (ADR-005)
+        if: success() || failure()
+        shell: bash
+        run: |
+          { echo '### Trace gate'; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          status=0
+          python tools/trace_check.py build/docs/needs/needs.json | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
       # Fails while any value pb owes in the M1 work products is still open (ADR-004).
       - name: HARA check (ADR-004)
+        if: success() || failure()
         # Explicit bash: the container's default sh (dash) has no pipefail, and tee must not
         # mask the check's exit code. GitHub runs this as `bash -eo pipefail`.
         shell: bash
