@@ -173,6 +173,19 @@ jobs:
           done
       - name: Trace gate
         run: 'echo "Placeholder: tools/trace_check.py arrives in M2."'
+      # Fails while any value pb owes in the M1 work products is still open (ADR-004).
+      - name: HARA check (ADR-004)
+        # Explicit bash: the container's default sh (dash) has no pipefail, and tee must not
+        # mask the check's exit code. GitHub runs this as `bash -eo pipefail`.
+        shell: bash
+        run: |
+          { echo '### HARA check'; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          status=0
+          python tools/hara_check.py build/docs/needs/needs.json \
+            docs/00_item_definition.rst docs/01_hara.rst docs/02_safety_goals.rst \
+            docs/decisions/ADR-003-hara-scope.md | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: build/docs/html

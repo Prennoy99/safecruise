@@ -24,10 +24,11 @@ html_title = "SafeCruise"
 # checks every relative Markdown link against the repository instead.
 suppress_warnings = ["myst.xref_missing"]
 
-# --- sphinx-needs: need types (brief §6.1) ----------------------------------------------
+# --- sphinx-needs: need types (brief §6.1; HE_ from ADR-004) --------------------------
 _NEED_TYPES = [
     # directive, title, prefix, colour, style
     ("stk", "Stakeholder need", "STK_", "#BFD8D2", "node"),
+    ("he", "Hazardous event", "HE_", "#F5CBA7", "node"),  # ADR-004
     ("sg", "Safety goal", "SG_", "#F28C8C", "node"),
     ("sys", "System requirement", "SYS_", "#BFD8F2", "node"),
     ("fsr", "Functional safety requirement", "FSR_", "#F5B7A1", "node"),
@@ -43,12 +44,29 @@ needs_types = [
 ]
 
 needs_id_required = True
-needs_id_regex = r"^(STK|SG|SYS|FSR|TSR|AOU|SWR|ARC|TC)_[A-Z0-9]+(_[A-Z0-9]+)*$"
+needs_id_regex = r"^(STK|HE|SG|SYS|FSR|TSR|AOU|SWR|ARC|TC)_[A-Z0-9]+(_[A-Z0-9]+)*$"
 
-# --- Attributes (brief §6.1, ADR-000 D-17/D-18) -----------------------------------------
+# --- Attributes (brief §6.1, ADR-000 D-17/D-18, ADR-004) -------------------------------
 # asil: QM, A-D or decomposed, e.g. B(D). safe_state and ftti_ms on SG_. level and
 # method on TC_. Allowed values are enforced by tools/ears_lint.py (M2), not here.
-needs_extra_options = ["asil", "verification_method", "safe_state", "ftti_ms", "level", "method"]
+# HE_ carries its operational situation, malfunction, the S/E/C ratings and one rationale
+# per rating; tools/hara_check.py checks them against the ASIL table.
+needs_extra_options = [
+    "asil",
+    "verification_method",
+    "safe_state",
+    "ftti_ms",
+    "level",
+    "method",
+    "situation",
+    "malfunction",
+    "severity",
+    "severity_rationale",
+    "exposure",
+    "exposure_rationale",
+    "controllability",
+    "controllability_rationale",
+]
 
 # draft | approved; only pb sets approved (ADR-000 D-17).
 needs_statuses = [

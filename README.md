@@ -14,7 +14,8 @@ practice. This project is not compliant, certified or assessed.
 ## Status
 
 Progress by milestone is tracked in [PLAN.md](PLAN.md). Design decisions are recorded in
-[docs/decisions/](docs/decisions/).
+[docs/decisions/](docs/decisions/). The documentation and requirements database are
+published at https://prennoy99.github.io/safecruise/.
 
 ## Non-goals
 
