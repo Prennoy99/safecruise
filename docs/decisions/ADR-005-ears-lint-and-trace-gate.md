@@ -61,6 +61,11 @@ built in the `docs-trace-gate` job.
 - ASIL inheritance (error): an FSR, TSR or AOU has the same *target* ASIL as the highest of
   its parents. The target ASIL of a decomposed requirement is the part in brackets, so
   `B(D)` and `QM(D)` both inherit from a D parent.
+- System requirements (`SYS_`) state the nominal function and carry ASIL QM. Safety
+  integrity is carried only by the chain SG → FSR → TSR (and `AOU_`); a `SYS_` that
+  describes behaviour a safety goal also needs names that goal in its note. Rejected
+  alternative: rating `SYS_` with ASILs too, which would need `SYS_` → FSR links and
+  would give the same behaviour two integrity owners.
 - Warnings until M6, errors with `--strict`: a SYS, TSR or SWR without a test case; a need
   with ASIL A or higher that is still `draft`. JUnit results are added in M6.
 

@@ -10,10 +10,11 @@ Status: **M1 done (tag `m1`); M2 in progress** on branch `m2-requirements`. Noth
 this repo is a result yet.
 
 > **Next session starts here:** M2 on branch `m2-requirements`, plan in §9. Tooling is done
-> (EARS lint, trace gate v1, Graphviz; ADR-005 proposed). Next: requirements top-down
-> (`03` system, `07` minimal `ARC_`, `04` FSC with `AOU_`, `05` TSC), ADR-006
-> decomposition, ADR-007 black channel, and proposals for the M2 values in §5. The trace
-> gate fails until every safety goal has FSRs; that is the open to-do, not a defect.
+> (EARS lint, trace gate v1, Graphviz; ADR-005 proposed). `03` (7 `STK_`, 37 `SYS_`) and
+> `07` (9 `ARC_`) are drafted and pass the EARS lint; pb reviews. Next: `04` FSC with
+> `AOU_`, `05` TSC, ADR-006 decomposition, ADR-007 black channel, and proposals for the M2
+> values in §5. The trace gate fails until every safety goal has FSRs; that is the open
+> to-do, not a defect.
 
 ---
 
@@ -229,9 +230,10 @@ Branch `m2-requirements`. Items marked **(pb)** are pb's alone.
       and the allowed link types
 
 **Requirements**
-- [ ] `03_stakeholder_and_system_requirements.rst`: `STK_` needs; `SYS_` in EARS for modes
-      and transitions (D-11, D-13), HMI, speed and gap control, override, TOR, limits
-- [ ] `07_architecture.rst`: minimal `ARC_` elements (`Hmi`, `TgtSel`, `AccCtrl`, `AccMon`,
+- [x] `03_stakeholder_and_system_requirements.rst`: `STK_` needs; `SYS_` in EARS for modes
+      and transitions (D-11, D-13), HMI, speed and gap control, override, TOR, limits.
+      Drafted (7 `STK_`, 37 `SYS_`, all QM per ADR-005); **pb reviews**
+- [x] `07_architecture.rst`: minimal `ARC_` elements (`Hmi`, `TgtSel`, `AccCtrl`, `AccMon`,
       RTE, COM, E2E, CanIf, scheduler) as allocation targets; M3 adds the SysML model
 - [ ] `04_functional_safety_concept.rst`: `FSR_` per safety goal with ASIL, safe state and
       timing within the FTTI; `AOU_` for TOR display, cluster TOR on timeout, actuator
