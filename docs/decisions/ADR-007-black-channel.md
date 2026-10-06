@@ -1,7 +1,7 @@
 # ADR-007 — COM and CanIf as QM under a black-channel argument
 
-- **Status:** proposed
-- **Date:** 2026-10-06 (proposed)
+- **Status:** accepted
+- **Date:** 2026-10-06 (proposed and accepted)
 - **Decided by:** pb
 - **Relates to:** [ADR-000](ADR-000-project-setup.md) D-14, D-15, D-19;
   [ADR-006](ADR-006-asil-decomposition.md); docs `05_technical_safety_concept`
@@ -49,8 +49,7 @@ as a wrong scaling in the DBC that pack and unpack share. That is a specificatio
 of the CAN database, covered by the M5 known-answer tests of the DBC signals and by the
 SIL-vECU scenarios, not by the black channel.
 
-**Decision for pb:** ⟨pb: accept option 3, or choose another⟩. If option 1 is chosen,
-`TSR_ACC_023` and `TSR_ACC_024` are removed and COM gets the ASIL C measures.
+**Decision (pb, 2026-10-06):** option 3 as proposed.
 
 ## Consequences
 

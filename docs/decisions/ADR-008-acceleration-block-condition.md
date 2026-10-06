@@ -1,7 +1,7 @@
 # ADR-008 — Condition of the monitor's acceleration block
 
-- **Status:** proposed
-- **Date:** 2026-10-06 (proposed)
+- **Status:** accepted
+- **Date:** 2026-10-06 (proposed and accepted)
 - **Decided by:** pb
 - **Relates to:** brief §5.4 (checker rule 2), §7.2 (scenario 14), §7.6;
   [ADR-000](ADR-000-project-setup.md) D-06, D-16, D-17; [ADR-006](ADR-006-asil-decomposition.md);
@@ -62,9 +62,8 @@ Option 2, with these consequences:
 - **Radar noise.** `v_close` must stay above the range-rate noise of the radar, or the
   block flickers in steady following. `T_hold` (D-16) covers short dropouts.
 
-**Values for pb** (`⟨pb: …⟩` in `FSR_ACC_002`): the lateral band, `T_ttc`, `T_thw`,
-`v_close`, and the choice of option. ⟨pb: accept option 2 with values, or choose
-another⟩.
+**Decision (pb, 2026-10-06):** option 2 with a lateral band of ±2.5 m, `T_ttc` = 4.0 s,
+`T_thw` = 2.5 s and `v_close` = 0.5 m/s; `T_hold` = 500 ms (D-16).
 
 ## Consequences
 

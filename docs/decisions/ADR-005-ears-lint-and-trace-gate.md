@@ -1,7 +1,7 @@
 # ADR-005 — EARS lint and trace gate v1
 
-- **Status:** proposed
-- **Date:** 2026-10-06 (proposed)
+- **Status:** accepted
+- **Date:** 2026-10-06 (proposed and accepted)
 - **Decided by:** pb
 - **Relates to:** brief §6.2, §6.3, §12 M2; [ADR-000](ADR-000-project-setup.md) D-17, D-18;
   [ADR-004](ADR-004-hara-representation.md)

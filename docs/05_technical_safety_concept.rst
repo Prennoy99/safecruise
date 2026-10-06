@@ -1,8 +1,9 @@
 Technical safety concept
 ========================
 
-:Status: draft, for review by pb. Values marked ``⟨pb: …⟩`` are set by pb (ADR-000 D-17);
-         the ASILs of decomposed requirements follow ADR-006.
+:Status: draft. Safety values set by pb on 2026-10-06 (ADR-000 D-17); the ASILs of
+         decomposed requirements follow ADR-006. Each requirement stays ``draft`` until pb
+         approves it.
 :Applies: ISO 26262-4, clause 6 (technical safety concept), and ISO 26262-9, clause 5
           (ASIL decomposition), as applied concepts only
 
@@ -32,7 +33,7 @@ Request limits
    :status: draft
    :derives_from: FSR_ACC_001
    :allocated_to: ARC_ACC_CTRL
-   :asil: ⟨pb: ADR-006⟩
+   :asil: QM(C)
    :verification_method: test
 
    The AccCtrl component shall limit its proposed acceleration request to −3.5 to
@@ -45,7 +46,7 @@ Request limits
    :status: draft
    :derives_from: FSR_ACC_001
    :allocated_to: ARC_ACC_MON
-   :asil: ⟨pb: ADR-006⟩
+   :asil: C(C)
    :verification_method: test
 
    If the proposed acceleration request read by the AccMon component is not a number, is
@@ -64,11 +65,11 @@ Acceleration block
    :status: draft
    :derives_from: FSR_ACC_002, FSR_ACC_003
    :allocated_to: ARC_ACC_MON
-   :asil: ⟨pb: ADR-006⟩
+   :asil: B(B)
    :verification_method: test
 
    While the condition of :need:`FSR_ACC_002` holds for any object of the raw radar object
-   list, or held within the last ⟨pb: T_hold⟩ ms, the AccMon component shall send an
+   list, or held within the last 500 ms, the AccMon component shall send an
    acceleration request of at most 0 m/s².
 
    Checker side. The raw list, not the target from ``TgtSel`` (ADR-000 D-06).
@@ -78,11 +79,11 @@ Acceleration block
    :status: draft
    :derives_from: FSR_ACC_002, FSR_ACC_003
    :allocated_to: ARC_ACC_CTRL
-   :asil: ⟨pb: ADR-006⟩
+   :asil: QM(B)
    :verification_method: test
 
    While the condition of :need:`FSR_ACC_002` holds for any object of the raw radar object
-   list, or held within the last ⟨pb: T_hold⟩ ms, the AccCtrl component shall propose an
+   list, or held within the last 500 ms, the AccCtrl component shall propose an
    acceleration request of at most 0 m/s².
 
    Doer side. Applying the monitor's rule in the controller as well keeps a healthy
@@ -126,7 +127,7 @@ Driver precedence and activation
    :status: draft
    :derives_from: FSR_ACC_006
    :allocated_to: ARC_ACC_MON
-   :asil: ⟨pb: ADR-006⟩
+   :asil: B(B)
    :verification_method: test
 
    When the AccMon component reads the brake pedal pressed in ``VEH_Dyn`` or CANCEL
@@ -141,7 +142,7 @@ Driver precedence and activation
    :status: draft
    :derives_from: FSR_ACC_006
    :allocated_to: ARC_ACC_CTRL, ARC_HMI
-   :asil: ⟨pb: ADR-006⟩
+   :asil: QM(B)
    :verification_method: test
 
    When the AccCtrl component reads the brake pedal pressed or a CANCEL press, the AccCtrl
@@ -172,7 +173,7 @@ Input integrity
    :verification_method: test
 
    When a received ``RDR_Obj1..4``, ``VEH_Dyn`` or ``HMI_Btn`` message fails its CRC-8 or
-   alive counter check in ⟨pb: N_e2e⟩ consecutive messages, the E2E component shall
+   alive counter check in 3 consecutive messages, the E2E component shall
    report an end-to-end fault for that message.
 
    ADR-000 D-15: CRC-8 SAE J1850 over payload, alive counter and data ID; a repeated or
@@ -216,8 +217,7 @@ Input integrity
    If the AccMon component reads a value that violates :need:`FSR_ACC_010`, then the
    AccMon component shall latch a fault in the cycle in which the message arrives.
 
-   Limits ⟨pb: jump limits⟩ and ⟨pb: speed consistency limit⟩ are defined in
-   :need:`FSR_ACC_010`.
+   The limits are defined in :need:`FSR_ACC_010`.
 
 Deceleration and takeover
 -------------------------
@@ -232,7 +232,7 @@ Deceleration and takeover
 
    If the measured ego acceleration exceeds the negative request sent by the AccMon
    component, delayed by 50 ms and filtered by a first-order lag of 0.4 s, by more than
-   ⟨pb: a_tol⟩ m/s² for longer than ⟨pb: t_tol⟩ ms, then the AccMon component shall latch
+   1.0 m/s² for longer than 500 ms, then the AccMon component shall latch
    a fault.
 
    A-10 model of the actuator response (:need:`AOU_ACC_003`).
@@ -405,10 +405,10 @@ shows. These are design figures; the FTTI experiment in M4 measures them.
      - 470 ms
    * - ``SG_ACC_001`` (1000 ms)
      - Corrupted or lost radar messages (:need:`TSR_ACC_012`)
-     - ⟨pb: N_e2e⟩ × 50 ms, timeout 150 ms
+     - 3 × 50 ms, or timeout 150 ms
      - 10 ms
      - 450 ms
-     - 610 ms with 3 errors
+     - 610 ms
    * - ``SG_ACC_002`` (500 ms)
      - Request below −3.5 m/s² or too steep (:need:`TSR_ACC_002`)
      - in the cycle
@@ -423,16 +423,16 @@ shows. These are design figures; the FTTI experiment in M4 measures them.
      - 470 ms
    * - ``SG_ACC_003`` (1000 ms)
      - Too little deceleration (:need:`TSR_ACC_014`)
-     - 50 ms + ⟨pb: t_tol⟩ ms
+     - 50 ms + 500 ms
      - 10 ms
-     - ⟨pb: TOR latency⟩ ms
-     - 60 ms + ⟨pb: t_tol⟩ + ⟨pb: TOR latency⟩
+     - 200 ms
+     - 760 ms
    * - ``SG_ACC_003`` (1000 ms)
      - ACC ECU silent or monitor stalled (:need:`AOU_ACC_002`)
      - 30 ms (``ACC_Cmd`` × 3)
      - none
-     - ⟨pb: TOR latency⟩ ms
-     - 30 ms + ⟨pb: TOR latency⟩
+     - 200 ms
+     - 230 ms
    * - ``SG_ACC_004`` (500 ms)
      - Brake pedal while ACC requests (:need:`TSR_ACC_007`)
      - 10 ms

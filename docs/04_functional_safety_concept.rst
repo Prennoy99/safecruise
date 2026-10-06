@@ -1,7 +1,8 @@
 Functional safety concept
 =========================
 
-:Status: draft, for review by pb. Values marked ``⟨pb: …⟩`` are set by pb (ADR-000 D-17).
+:Status: draft. Safety values set by pb on 2026-10-06 (ADR-000 D-17); each requirement
+         stays ``draft`` until pb approves it.
 :Applies: ISO 26262-3, clause 7 (functional safety concept), as applied concepts only
 
 The functional safety requirements (``FSR_``) say how the item meets each safety goal of
@@ -57,9 +58,9 @@ Fault detection
    :asil: B
    :verification_method: test
 
-   While a valid radar object within a lateral offset of ±⟨pb: block band⟩ m has a
-   time-to-collision below ⟨pb: T_ttc⟩ s, or a time headway below ⟨pb: T_thw⟩ s while
-   closing faster than ⟨pb: v_close⟩ m/s, the ACC system shall send no positive
+   While a valid radar object within a lateral offset of ±2.5 m has a
+   time-to-collision below 4.0 s, or a time headway below 2.5 s while
+   closing faster than 0.5 m/s, the ACC system shall send no positive
    acceleration request.
 
    Checker rule 2, widened by ADR-008: a time-to-collision rule alone detects an
@@ -78,7 +79,7 @@ Fault detection
    :verification_method: test
 
    When the condition of :need:`FSR_ACC_002` ends, the ACC system shall keep sending no
-   positive acceleration request for ⟨pb: T_hold⟩ ms.
+   positive acceleration request for 500 ms.
 
    ADR-000 D-16: a radar dropout of the close target for 1 or 2 radar frames must not
    release the block. Scenario 14, dropout variant.
@@ -150,7 +151,7 @@ Fault detection
    :verification_method: test
 
    If a received ``RDR_Obj1..4``, ``VEH_Dyn`` or ``HMI_Btn`` message fails its end-to-end
-   check in ⟨pb: N_e2e⟩ consecutive messages, then the ACC system shall report a fault.
+   check in 3 consecutive messages, then the ACC system shall report a fault.
 
    ADR-000 D-15 (default 3). A single bad message is discarded and the last valid value
    is held (:need:`SYS_ACC_036`).
@@ -179,8 +180,8 @@ Fault detection
 
    If ego speed, ego acceleration, or the range, range rate or lateral offset of a radar
    object is not a number, outside its signal range, changes between two consecutive
-   messages by more than ⟨pb: jump limits⟩, or ego speed departs from the integral of ego
-   acceleration by more than ⟨pb: speed consistency limit⟩, then the ACC system shall
+   messages by more than 1 km/h for ego speed, 3 m for range, 2 m/s for range rate or 0.5 m for lateral offset, or ego speed departs from the integral of ego
+   acceleration by more than 3 km/h over 1 s, then the ACC system shall
    report a fault.
 
    Checker rule 4; scenario 13 (stuck or implausible ego speed). Radar jumps are checked
@@ -196,8 +197,8 @@ Fault detection
    :verification_method: test
 
    If the measured ego acceleration is above the expected response to a deceleration
-   request of the ACC system by more than ⟨pb: a_tol⟩ m/s² for longer than
-   ⟨pb: t_tol⟩ ms, then the ACC system shall report a fault.
+   request of the ACC system by more than 1.0 m/s² for longer than
+   500 ms, then the ACC system shall report a fault.
 
    ADR-003: detects deceleration that the actuators do not deliver. The expected response
    is the request passed through the actuator response of A-10.
@@ -211,7 +212,7 @@ Fault detection
    :verification_method: test
 
    While the ACC system is active and a valid radar object within a lateral offset of
-   ±⟨pb: block band⟩ m has a time-to-collision below ⟨pb: T_tor⟩ s, the ACC system shall
+   ±2.5 m has a time-to-collision below 3.0 s, the ACC system shall
    raise the takeover request.
 
    Covers a controller that brakes too little for the situation, which
@@ -307,7 +308,7 @@ a real vehicle would have to show them.
    :asil: C
 
    When ``ACC_Cmd`` carries the takeover request, the instrument cluster shall show it
-   with a visual and an acoustic signal within ⟨pb: TOR latency⟩ ms.
+   with a visual and an acoustic signal within 200 ms.
 
 .. aou:: Cluster on loss of the ACC messages
    :id: AOU_ACC_002
@@ -377,8 +378,8 @@ a real vehicle would have to show them.
    ±0.3 m/s² of their true values in ``VEH_Dyn``.
 
    Errors smaller than this are not detectable by the plausibility checks and are not
-   relied on. The accuracy is a design value; ⟨pb: a_tol⟩ must be larger than the
-   acceleration error.
+   relied on. The accuracy is a design value; the tolerance of :need:`FSR_ACC_011`
+   (1.0 m/s²) is more than three times the acceleration error.
 
 .. aou:: Radar detection
    :id: AOU_ACC_008
@@ -386,7 +387,7 @@ a real vehicle would have to show them.
    :derives_from: FSR_ACC_002, FSR_ACC_012
    :asil: B
 
-   The radar shall report every moving object within 150 m and within ±⟨pb: block band⟩ m
+   The radar shall report every moving object within 150 m and within ±2.5 m
    of the ego lane centre within 3 cycles of the radar, and report no object where none
    exists.
 
@@ -407,7 +408,8 @@ a real vehicle would have to show them.
 Unintended acceleration or braking within the limits
 ----------------------------------------------------
 
-*Draft argument for pb to confirm or reject (ADR-003, consequences).*
+*Argument confirmed by pb on 2026-10-06 (ADR-003, consequences); the M4 MIL run checks
+the braking claim with a follower model.*
 
 The limit check (:need:`FSR_ACC_001`) removes requests beyond +2.0 and −3.5 m/s² and
 steps faster than 2.5 m/s³. A wrong request **within** these limits cannot be told apart
@@ -418,14 +420,14 @@ from correct control by a limit check. It remains, and is argued as follows.
   1.4 s plus the actuator response, and the brake lights come on at the start. This is
   the profile of a normal ACC braking, which following traffic meets every day. The
   driver ends it with the accelerator (:need:`FSR_ACC_007`) or CANCEL
-  (:need:`FSR_ACC_006`). The claim to confirm: with this build-up, a follower at a 1 s
-  gap and 1.5 s reaction time does not collide, so the remainder is controllable (C1 or
-  better) rather than C3. The M4 MIL run can check it with a follower model.
+  (:need:`FSR_ACC_006`). The claim: with this build-up, a follower at a 1 s gap and
+  1.5 s reaction time does not collide, so the remainder is controllable (C1 or better)
+  rather than C3.
 - **Acceleration within A-04** (``SG_ACC_001``). Without a vehicle ahead (``HE_OS1_M1``,
   ASIL A), +2 m/s² beyond the set speed is felt and seen on the speedometer. Once a
   vehicle comes within range, :need:`FSR_ACC_002` blocks it and :need:`FSR_ACC_004` raises
   a fault with a takeover request, at the latest when the time headway falls below
-  ⟨pb: T_thw⟩ s while closing.
+  2.5 s while closing.
 
 Trace from the safety goals
 ---------------------------

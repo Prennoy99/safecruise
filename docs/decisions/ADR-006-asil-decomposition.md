@@ -1,7 +1,7 @@
 # ADR-006 — ASIL decomposition of AccCtrl / AccMon and the ASIL of TgtSel
 
-- **Status:** proposed
-- **Date:** 2026-10-06 (proposed)
+- **Status:** accepted
+- **Date:** 2026-10-06 (proposed and accepted)
 - **Decided by:** pb
 - **Relates to:** brief §1.3, §5.1, §9; [ADR-000](ADR-000-project-setup.md) D-06, D-10, D-16,
   D-17; [ADR-005](ADR-005-ears-lint-and-trace-gate.md); [ADR-008](ADR-008-acceleration-block-condition.md);
@@ -51,8 +51,7 @@ Option 2 (the brief's doer/checker idea):
   (`TSR_ACC_019`), so the mode display does not depend on the controller. This extends
   D-10, where the monitor owned `ACC_Cmd` only.
 
-**Values for pb:** ⟨pb: accept option 2, or choose another⟩, and with it the ASIL fields
-marked ⟨pb: ADR-006⟩ in `05_technical_safety_concept`.
+**Decision (pb, 2026-10-06):** option 2 as proposed, with the ASILs in the table above.
 
 ## Independence argument
 
