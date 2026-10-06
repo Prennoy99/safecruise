@@ -10,11 +10,12 @@ Status: **M1 done (tag `m1`); M2 in progress** on branch `m2-requirements`. Noth
 this repo is a result yet.
 
 > **Next session starts here:** M2 on branch `m2-requirements`, plan in §9. Tooling is done
-> (EARS lint, trace gate v1, Graphviz; ADR-005 proposed). `03` (7 `STK_`, 37 `SYS_`) and
-> `07` (9 `ARC_`) are drafted and pass the EARS lint; pb reviews. Next: `04` FSC with
-> `AOU_`, `05` TSC, ADR-006 decomposition, ADR-007 black channel, and proposals for the M2
-> values in §5. The trace gate fails until every safety goal has FSRs; that is the open
-> to-do, not a defect.
+> (EARS lint, trace gate v1, Graphviz). All requirement documents are drafted: `03`
+> (7 `STK_`, 37 `SYS_`), `07` (9 `ARC_`), `04` (17 `FSR_`, 9 `AOU_`), `05` (24 `TSR_`
+> with time budget); ADR-005 to ADR-008 proposed. The trace gate passes. The EARS lint
+> fails only on the `⟨pb: …⟩` values in §5 and the decomposed ASILs of ADR-006. Next: pb
+> decides ADR-005 to ADR-008 and the §5 values, then approves the requirements at
+> ASIL ≥ A.
 
 ---
 
@@ -74,13 +75,15 @@ that remain.
 | S/E/C ratings with rationale, ASIL per hazardous event | M1 | done (approved) |
 | Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | done (approved) |
 | FTTI hazard criterion and assumed FTTI (before the MIL run) | M4 | open |
-| TTC threshold for checker rule 2 | M2 | open |
+| Block condition of checker rule 2: lateral band, `T_ttc`, `T_thw`, `v_close` (ADR-008) | M2 | open |
 | `AccMon` block hold time `T_hold` | M2 | open |
-| Plausibility jump limits (checker rule 4) | M2 | open |
-| E2E consecutive-error count (default 3) | M2 | open |
-| ASIL of `TgtSel` and the decomposition of `AccCtrl` / `AccMon` | M2 | open |
-| Tolerance between requested and measured acceleration (detects too little deceleration, ADR-003) | M2 | open |
+| Plausibility jump limits and speed consistency limit (checker rule 4) | M2 | open |
+| E2E consecutive-error count `N_e2e` (default 3) | M2 | open |
+| ASIL of `TgtSel` and the decomposition of `AccCtrl` / `AccMon` (ADR-006) | M2 | open |
+| Tolerance `a_tol` and duration `t_tol` between requested and measured acceleration (detects too little deceleration, ADR-003) | M2 | open |
+| TTC threshold `T_tor` for the takeover request at short time-to-collision | M2 | open |
 | TOR display latency (cluster assumption of use) | M2 | open |
+| Unintended braking within A-05 is controllable (draft argument in `04`) | M2 | open |
 
 ## 6. Environment facts (checked 2026-09-29, updated 2026-10-06)
 
@@ -235,16 +238,22 @@ Branch `m2-requirements`. Items marked **(pb)** are pb's alone.
       Drafted (7 `STK_`, 37 `SYS_`, all QM per ADR-005); **pb reviews**
 - [x] `07_architecture.rst`: minimal `ARC_` elements (`Hmi`, `TgtSel`, `AccCtrl`, `AccMon`,
       RTE, COM, E2E, CanIf, scheduler) as allocation targets; M3 adds the SysML model
-- [ ] `04_functional_safety_concept.rst`: `FSR_` per safety goal with ASIL, safe state and
+- [x] `04_functional_safety_concept.rst`: `FSR_` per safety goal with ASIL, safe state and
       timing within the FTTI; `AOU_` for TOR display, cluster TOR on timeout, actuator
       execution, brake-signal integrity, radar plausibility, radar moving objects only,
-      receiver-side E2E check of `ACC_Cmd`; `needflow` per safety goal
-- [ ] `05_technical_safety_concept.rst`: `TSR_` allocated to `ARC_` elements or covered by
+      receiver-side E2E check of `ACC_Cmd`; `needflow` per safety goal. Drafted (17 `FSR_`,
+      9 `AOU_`) with the draft argument for unintended braking within A-05; **pb reviews**
+- [x] `05_technical_safety_concept.rst`: `TSR_` allocated to `ARC_` elements or covered by
       `AOU_`; detection and reaction time budget against each FTTI; `needflow` from each
-      safety goal down to the TSRs
-- [ ] **ADR-006** ASIL decomposition of `AccCtrl` / `AccMon` and the ASIL of `TgtSel`, with
-      the independence argument and its limitations (one ECU, shared radar input)
-- [ ] **ADR-007** COM and CanIf as QM under the black-channel argument (D-19)
+      safety goal down to the TSRs. Drafted (24 `TSR_`); **pb reviews**
+- [x] **ADR-006** (proposed) ASIL decomposition of `AccCtrl` / `AccMon` and the ASIL of
+      `TgtSel`, with the independence argument and its limitations (one ECU, shared radar
+      input)
+- [x] **ADR-007** (proposed) COM and CanIf as QM under the black-channel argument (D-19);
+      COM packing sits inside the E2E boundary, so read-back checks are proposed
+- [x] **ADR-008** (proposed) block condition of checker rule 2: TTC alone detects the
+      scenario-14 fault in steady following too late; TTC or short headway while closing
+- [ ] **(pb)** accept or change ADR-005 to ADR-008
 
 **pb**
 - [ ] **(pb)** values in §5 marked M2 (proposed with reasoning, written in by pb)
