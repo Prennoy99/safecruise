@@ -1,14 +1,14 @@
 Architecture
 ============
 
-:Status: draft. M2 holds the architecture elements as allocation targets only; the SysML v2
-         model with structure, ports, the mode state machine and the allocation views
-         follows in M3.
+:Status: draft. The ``ARC_`` needs below are the allocation targets of M2; the SysML v2
+         model (M3) describes their structure, interfaces, behaviour and allocation.
 :Applies: ISO 26262-4, clause 6 (system architectural design), and Automotive SPICE
           SYS.3 / SWE.2, as applied concepts only
 
 Each ``ARC_`` need is one element of the ACC ECU software. Requirements are allocated to
-them with ``allocated_to``. The names mirror the SysML part names that M3 introduces.
+them with ``allocated_to``. Each ``ARC_`` need has a part def of the same name in the SysML
+model, with the need's ID as its short name (ADR-009).
 Elements outside the ACC ECU (radar, powertrain and brakes, HMI hardware, cluster) are
 simulated and are not ``ARC_`` needs; what the item relies on from them is recorded as
 assumptions of use in :doc:`04_functional_safety_concept`.
@@ -28,6 +28,98 @@ One 10 ms tick runs the elements in this order (ADR-000 D-14)::
 ``AccCtrl`` writes a proposed request; ``AccMon`` is the only element that writes
 ``ACC_Cmd`` (ADR-000 D-10). ``AccMon`` reads the raw radar object list, not the target
 selected by ``TgtSel`` (ADR-000 D-06).
+
+SysML v2 model
+--------------
+
+The model lives in ``model/sysml/`` as SysML v2 textual notation and is loaded in this
+order:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - File
+     - Content
+   * - ``Interfaces.sysml``
+     - One ``item def`` per CAN message with its signals and units; port defs for the
+       messages, for the basic software and for the data the components exchange
+       through the RTE.
+   * - ``AccModes.sysml``
+     - ``state def AccModes``: the six modes and their transitions in the priority order
+       of :need:`SYS_ACC_001`.
+   * - ``SafeCruise.sysml``
+     - Item context, ACC ECU structure, one ``part def`` per ``ARC_`` element, item
+       flows, and the order of the runnables in one cycle (``EcuCycle``).
+   * - ``Requirements.sysml``
+     - One requirement usage per allocated ``SYS_`` and ``TSR_``, identified by its ID
+       only. The text stays in this database.
+   * - ``Allocation.sysml``
+     - The mode machine allocated to ``AccCtrl``, ``EcuCycle`` to the scheduler, and one
+       ``satisfy`` per entry in the ``allocated_to`` links of the requirements.
+
+``tools/sysml_check.py`` parses the model with the SysML v2 Pilot Implementation
+(ADR-001), reads the parsed model and checks it against ``needs.json``: every ID in the
+model exists with the right type; ``ARC_`` needs and part defs match one to one; for every
+``SYS_`` and ``TSR_`` the satisfying parts are exactly its ``allocated_to`` elements. CI
+runs the check in ``docs-trace-gate`` and renders the views below from the model in the
+same step; they are not committed (ADR-009). To render them locally::
+
+    python tools/sysml_check.py build/docs/needs/needs.json --views build/sysml/views
+
+Item context
+~~~~~~~~~~~~
+
+The item and its environment, drawn as the logical CAN message flows on one bus. Only the
+ACC ECU is implemented; the other elements are simulated, and the item's reliance on them
+is recorded as assumptions of use in :doc:`04_functional_safety_concept`.
+
+.. image:: ../build/sysml/views/item_context.svg
+   :alt: Interconnection view of the item context
+   :width: 100%
+
+ACC ECU structure
+~~~~~~~~~~~~~~~~~
+
+CanIf, COM and E2E on the left, the RTE in the middle, the four software components on
+the right. A port shown with ``~`` is the receiving (conjugated) side. ``AccMon`` reads
+the raw radar objects, pedals and buttons from the RTE, not the outputs of ``TgtSel`` and
+``Hmi`` (ADR-000 D-06). Two flows run against the execution order and are read in the next
+cycle: the mode from ``AccCtrl`` to ``Hmi`` and the latched fault from ``AccMon`` to
+``AccCtrl``.
+
+.. image:: ../build/sysml/views/ecu_structure.svg
+   :alt: Interconnection view of the ACC ECU
+   :width: 100%
+
+Execution order
+~~~~~~~~~~~~~~~
+
+One 10 ms cycle (ADR-000 D-14, :need:`SYS_ACC_034`, :need:`TSR_ACC_021`). The runnable order
+is declared again in ``rte/swc_config.yaml`` in M5.
+
+.. image:: ../build/sysml/views/ecu_cycle.svg
+   :alt: Action view of one ECU cycle
+
+Mode state machine
+~~~~~~~~~~~~~~~~~~
+
+Exhibited by ``AccCtrl``. SysML v2 does not rank transitions whose guards hold at the
+same time, so the priority order of :need:`SYS_ACC_001` is written into the guards: each
+level is false while a higher level holds, which makes the outgoing guards of every state
+mutually exclusive. Activation from STANDBY ranks below level 3. The guards are reviewed
+here; the MIL reference (M4) executes the same table.
+
+.. image:: ../build/sysml/views/acc_modes.svg
+   :alt: State view of the ACC modes
+   :width: 100%
+
+The guards, as written in the model:
+
+.. literalinclude:: ../model/sysml/AccModes.sysml
+   :language: text
+   :start-after: // Priority levels
+   :end-before: // Effects.
 
 Software components
 -------------------

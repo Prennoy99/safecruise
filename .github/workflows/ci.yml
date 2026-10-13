@@ -157,20 +157,26 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Docs (HTML)
-        run: sphinx-build -b html -W --keep-going docs build/docs/html
+      # Order: needs.json first, then the SysML check (which reads it and renders the views),
+      # then the HTML build (which shows the views). ADR-009.
       - name: Requirements export (needs.json)
         run: |
           sphinx-build -b needs -W --keep-going docs build/docs/needs
           test -s build/docs/needs/needs.json
-          cp build/docs/needs/needs.json build/docs/html/needs.json
-      - name: "Spike 1 (ADR-001): SysML v2 toy model parses"
-        run: python tools/sysml_parse.py model/sysml/spike/Toy.sysml
-      - name: "Spike 1 (ADR-001): broken models fail"
+      # The ADR-001 spike checks (toy model, broken fixtures) run under pytest in build-unit.
+      - name: SysML model check and views (ADR-009)
+        shell: bash
         run: |
-          for f in tests/tools/fixtures/broken_syntax.sysml tests/tools/fixtures/broken_reference.sysml; do
-            if python tools/sysml_parse.py "$f"; then echo "::error::$f parsed but must fail"; exit 1; fi
-          done
+          { echo '### SysML model check'; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          status=0
+          python tools/sysml_check.py build/docs/needs/needs.json --views build/sysml/views \
+            | tee -a "$GITHUB_STEP_SUMMARY" || status=$?
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+      - name: Docs (HTML)
+        run: |
+          sphinx-build -b html -W --keep-going docs build/docs/html
+          cp build/docs/needs/needs.json build/docs/html/needs.json
       # EARS lint and trace gate v1 (ADR-005); the trace gate becomes --strict in M6.
       - name: EARS lint (ADR-005)
         shell: bash

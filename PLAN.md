@@ -6,16 +6,12 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M1 done (tag `m1`); M2 in review** on branch `m2-requirements`. Nothing in
-this repo is a result yet.
+Status: **M2 done (tag `m2`); M3 in progress** on branch `m3-sysml`. Nothing in this
+repo is a result yet.
 
-> **Next session starts here:** M2 on branch `m2-requirements`, plan in §9. All
-> requirement documents are drafted; pb set the §5 values and accepted ADR-005 to ADR-008
-> on 2026-10-06. EARS lint, HARA check and trace gate pass; the HTML build renders all
-> `needflow` diagrams. The consistency review of the values (§9) added the accuracy
-> assumptions `AOU_ACC_007` (changed) and `AOU_ACC_010` (new). Open: pb reviews them,
-> approves the 48 requirements at ASIL ≥ A (17 `FSR_`, 21 `TSR_`, 10 `AOU_`) and opens the
-> M2 PR.
+> **Next session starts here:** M3 on branch `m3-sysml`, plan in §10. Model, check, views
+> and ADR-009 are drafted and pass locally. Open: pb reviews ADR-009 (including the FAULT
+> exit finding), runs the broken-ID demonstration in CI and opens the M3 PR.
 
 ---
 
@@ -31,8 +27,8 @@ this repo is a result yet.
 |---|---|---|---|---|
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
 | M1 | Item definition, HARA, safety goals | done | `m1` | 19 hazardous events, 4 safety goals (B / C / B / B); ADR-003, ADR-004 |
-| M2 | Requirements and safety concepts | in review | — | 7 `STK_`, 37 `SYS_`, 17 `FSR_`, 24 `TSR_`, 10 `AOU_`; EARS lint, trace gate v1; ADR-005 to ADR-008 |
-| M3 | SysML v2 architecture | not started | — | |
+| M2 | Requirements and safety concepts | done | `m2` | 7 `STK_`, 37 `SYS_`, 17 `FSR_`, 24 `TSR_`, 10 `AOU_`; EARS lint, trace gate v1; ADR-005 to ADR-008 |
+| M3 | SysML v2 architecture | in progress | — | Model, `sysml_check.py`, views in `07`; ADR-009 |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
 | M5 | Software requirements and embedded C | not started | — | |
 | M6 | SIL, back-to-back, fault injection | not started | — | Trace gate strict |
@@ -270,3 +266,52 @@ Branch `m2-requirements`. Items marked **(pb)** are pb's alone.
 **Done when:** EARS lint passes on all requirements; no dangling links; `needflow` diagrams
 render from each safety goal down to the TSRs; the decomposition ADR records the
 independence argument and its limitations; CI green; pb merges and tags `m2`.
+
+M2 closed 2026-10-13: PR #3 merged as `3ad002a`, tagged `m2`. CI run 38440922615 on `main`
+green. All 48 requirements at ASIL ≥ A approved; the 37 `SYS_` are QM and stay `draft`
+until pb reviews them.
+
+## 10. M3 plan
+
+Brief §12 M3, refined by ADR-000 D-11, D-14 and ADR-001. Branch `m3-sysml`. Items marked
+**(pb)** are pb's alone. M3 sets no safety values.
+
+**Model** (`model/sysml/`, loaded in this order)
+- [x] PLAN.md: close M2, M3 plan (first commit on the branch)
+- [x] `Interfaces.sysml`: one `item def` per CAN message with its signals and units
+      (brief §5.6), E2E fields in a common base; port defs for the messages and for the
+      data the components exchange through the RTE
+- [x] `AccModes.sysml`: `state def` of the six modes; the D-11 priority order written as
+      mutually exclusive guards, one named guard per priority level (`SYS_ACC_001`)
+- [x] `SafeCruise.sysml`: item context (radar, vehicle, HMI panel, cluster, actuators, ACC
+      ECU) and the ECU structure: one `part def` per `ARC_` element, with the `ARC_` ID as
+      its short name; item flows between the components
+- [x] `Requirements.sysml`: one requirement usage per allocated `SYS_` / `TSR_`, identified
+      by its ID only; text, ASIL and status stay in the requirements database
+- [x] `Allocation.sysml`: `satisfy` relations mirroring `allocated_to` in the database;
+      the mode machine and the cycle allocated to `AccCtrl` and the scheduler with
+      `allocate` (inside the part defs they push the structure views past the renderer's
+      element limit)
+
+**Tooling**
+- [x] `tools/sysml_check.py` + tests: all model files parse in one kernel session; every
+      ID in the model exists in `needs.json` with the matching type; `ARC_` needs and
+      `ARC_` part defs match one to one, by ID and name; for every `SYS_` / `TSR_` / `SWR_`
+      the set of satisfying parts equals its `allocated_to` set
+- [x] Views rendered from the model into `build/` (not committed): item context, ECU
+      structure, mode state machine; shown in `07_architecture.rst`
+- [x] CI (`docs-trace-gate`): needs export → model check with views → HTML build. The
+      broken-ID fixture runs under pytest (`tests/tools/test_sysml_check.py`); the ADR-001
+      spike checks moved there too
+- [x] **ADR-009** (proposed) SysML model conventions and the consistency check. Includes a
+      finding: with the D-14 order, leaving FAULT took two CANCEL presses; proposed fix in
+      the model (`AccCtrl` follows the monitor's release)
+
+**pb**
+- [ ] **(pb)** accept or change ADR-009
+- [ ] **(pb)** push a commit with a deliberately broken ID, confirm CI fails, then revert
+      (brief *Done when*)
+
+**Done when:** the model parses (ADR-001); rendered views (structure, state machine)
+appear in `07_architecture.rst`; the consistency check runs in CI and failed once on a
+deliberately broken ID, then passed after the revert; CI green; pb merges and tags `m3`.
