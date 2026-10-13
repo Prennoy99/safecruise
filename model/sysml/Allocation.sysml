@@ -74,7 +74,7 @@ package SafeCruiseAllocation {
     satisfy 'SYS_ACC_033' by SafeCruise::safeCruise.accEcu.accMon;
     satisfy 'SYS_ACC_037' by SafeCruise::safeCruise.accEcu.accMon;
     satisfy 'TSR_ACC_002' by SafeCruise::safeCruise.accEcu.accMon;
-    satisfy 'TSR_ACC_003' by SafeCruise::safeCruise.accEcu.accMon;
+    satisfy 'TSR_ACC_903' by SafeCruise::safeCruise.accEcu.accMon;
     satisfy 'TSR_ACC_005' by SafeCruise::safeCruise.accEcu.accMon;
     satisfy 'TSR_ACC_006' by SafeCruise::safeCruise.accEcu.accMon;
     satisfy 'TSR_ACC_007' by SafeCruise::safeCruise.accEcu.accMon;

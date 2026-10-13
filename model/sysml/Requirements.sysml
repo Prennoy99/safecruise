@@ -48,7 +48,7 @@ package SafeCruiseRequirements {
     // Technical safety requirements (docs/05)
     requirement <'TSR_ACC_001'> controllerOutputLimits;
     requirement <'TSR_ACC_002'> monitorLimitAndJerkCheck;
-    requirement <'TSR_ACC_003'> monitorAccelerationBlock;
+    requirement <'TSR_ACC_903'> monitorAccelerationBlock;
     requirement <'TSR_ACC_004'> controllerAccelerationBlock;
     requirement <'TSR_ACC_005'> positiveRequestAgainstTheBlock;
     requirement <'TSR_ACC_006'> monitorActivationRecord;
