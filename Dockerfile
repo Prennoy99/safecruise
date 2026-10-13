@@ -12,14 +12,15 @@ ARG MICROMAMBA_VERSION=2.9.0-0
 ARG MICROMAMBA_SHA256=366cd9cd8be14df1ab8ed50352a82111082a36686b2d389fdb79a92c3fafb3e3
 ARG SYSML_KERNEL_VERSION=0.62.0
 
-# C toolchain (GCC 14, D-08), static analysis, CAN utilities, Python 3.12, Java 21.
+# C toolchain (GCC 14, D-08), static analysis, CAN utilities, Python 3.12, Java 21,
+# Graphviz for the sphinx-needs trace diagrams (needflow, M2).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       gcc-14 g++-14 cmake ninja-build make \
       cppcheck clang-format \
       python3.12 python3.12-venv \
       openjdk-21-jre-headless \
-      can-utils iproute2 \
+      can-utils iproute2 graphviz \
       git ca-certificates curl bzip2 \
  && rm -rf /var/lib/apt/lists/* \
  && ln -s /usr/bin/gcov-14 /usr/local/bin/gcov
