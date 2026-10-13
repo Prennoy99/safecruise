@@ -36,7 +36,7 @@ Fault detection
 
 .. fsr:: Acceleration and jerk limits
    :id: FSR_ACC_001
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_002
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -52,7 +52,7 @@ Fault detection
 
 .. fsr:: No positive acceleration near a close object
    :id: FSR_ACC_002
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001
    :allocated_to: ARC_ACC_MON, ARC_ACC_CTRL
    :asil: B
@@ -72,7 +72,7 @@ Fault detection
 
 .. fsr:: Hold of the acceleration block
    :id: FSR_ACC_003
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001
    :allocated_to: ARC_ACC_MON, ARC_ACC_CTRL
    :asil: B
@@ -86,7 +86,7 @@ Fault detection
 
 .. fsr:: Acceleration against the block is a fault
    :id: FSR_ACC_004
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -100,7 +100,7 @@ Fault detection
 
 .. fsr:: Request only after driver activation
    :id: FSR_ACC_005
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_002, SG_ACC_004
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -116,7 +116,7 @@ Fault detection
 
 .. fsr:: Brake pedal and CANCEL end the request
    :id: FSR_ACC_006
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_004, SG_ACC_001
    :allocated_to: ARC_ACC_MON, ARC_ACC_CTRL
    :asil: B
@@ -130,7 +130,7 @@ Fault detection
 
 .. fsr:: Accelerator pedal ends ACC braking
    :id: FSR_ACC_007
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_002
    :allocated_to: ARC_ACC_MON, ARC_ACC_CTRL
    :asil: C
@@ -144,7 +144,7 @@ Fault detection
 
 .. fsr:: Input end-to-end fault
    :id: FSR_ACC_008
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_003, SG_ACC_004
    :allocated_to: ARC_E2E, ARC_ACC_MON
    :asil: B
@@ -158,7 +158,7 @@ Fault detection
 
 .. fsr:: Input timeout
    :id: FSR_ACC_009
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_003, SG_ACC_004
    :allocated_to: ARC_RTE, ARC_ACC_MON
    :asil: B
@@ -172,7 +172,7 @@ Fault detection
 
 .. fsr:: Input plausibility
    :id: FSR_ACC_010
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_003
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -190,7 +190,7 @@ Fault detection
 
 .. fsr:: Too little deceleration
    :id: FSR_ACC_011
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_003
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -205,7 +205,7 @@ Fault detection
 
 .. fsr:: Takeover request at short time-to-collision
    :id: FSR_ACC_012
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_003
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -224,7 +224,7 @@ Fault reaction
 
 .. fsr:: Fault latch
    :id: FSR_ACC_013
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_002, SG_ACC_003, SG_ACC_004
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -237,7 +237,7 @@ Fault reaction
 
 .. fsr:: Safe state for a positive request
    :id: FSR_ACC_014
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -251,7 +251,7 @@ Fault reaction
 
 .. fsr:: Safe state for a negative request
    :id: FSR_ACC_015
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_002
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -266,7 +266,7 @@ Fault reaction
 
 .. fsr:: Takeover request and mode on a fault
    :id: FSR_ACC_016
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_002, SG_ACC_003
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -282,7 +282,7 @@ Fault reaction
 
 .. fsr:: Protected command output
    :id: FSR_ACC_017
-   :status: draft
+   :status: approved
    :derives_from: SG_ACC_001, SG_ACC_002, SG_ACC_003, SG_ACC_004
    :allocated_to: ARC_E2E, ARC_ACC_MON
    :asil: C
@@ -303,7 +303,7 @@ a real vehicle would have to show them.
 
 .. aou:: TOR display
    :id: AOU_ACC_001
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_012, FSR_ACC_016
    :asil: C
 
@@ -312,7 +312,7 @@ a real vehicle would have to show them.
 
 .. aou:: Cluster on loss of the ACC messages
    :id: AOU_ACC_002
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_016, FSR_ACC_017
    :asil: C
 
@@ -324,7 +324,7 @@ a real vehicle would have to show them.
 
 .. aou:: Actuator response
    :id: AOU_ACC_003
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_014, FSR_ACC_015
    :asil: C
 
@@ -336,7 +336,7 @@ a real vehicle would have to show them.
 
 .. aou:: Receiver check of the command
    :id: AOU_ACC_004
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_017
    :asil: C
 
@@ -348,7 +348,7 @@ a real vehicle would have to show them.
 
 .. aou:: Request active flag respected
    :id: AOU_ACC_005
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_005, FSR_ACC_006, FSR_ACC_014
    :asil: C
 
@@ -357,7 +357,7 @@ a real vehicle would have to show them.
 
 .. aou:: Pedal signals
    :id: AOU_ACC_006
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_006, FSR_ACC_007
    :asil: C
 
@@ -370,7 +370,7 @@ a real vehicle would have to show them.
 
 .. aou:: Ego motion signals
    :id: AOU_ACC_007
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_010, FSR_ACC_011
    :asil: B
 
@@ -400,7 +400,7 @@ a real vehicle would have to show them.
 
 .. aou:: Radar detection
    :id: AOU_ACC_008
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_002, FSR_ACC_012
    :asil: B
 
@@ -413,7 +413,7 @@ a real vehicle would have to show them.
 
 .. aou:: Radar reports moving objects only
    :id: AOU_ACC_009
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_002
    :asil: B
 
@@ -424,7 +424,7 @@ a real vehicle would have to show them.
 
 .. aou:: Radar measurement accuracy
    :id: AOU_ACC_010
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_002, FSR_ACC_010
    :asil: B
 

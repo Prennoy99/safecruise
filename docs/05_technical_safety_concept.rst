@@ -30,7 +30,7 @@ Request limits
 
 .. tsr:: Controller output limits
    :id: TSR_ACC_001
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_001
    :allocated_to: ARC_ACC_CTRL
    :asil: QM(C)
@@ -43,7 +43,7 @@ Request limits
 
 .. tsr:: Monitor limit and jerk check
    :id: TSR_ACC_002
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_001
    :allocated_to: ARC_ACC_MON
    :asil: C(C)
@@ -62,7 +62,7 @@ Acceleration block
 
 .. tsr:: Monitor acceleration block
    :id: TSR_ACC_003
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_002, FSR_ACC_003
    :allocated_to: ARC_ACC_MON
    :asil: B(B)
@@ -76,7 +76,7 @@ Acceleration block
 
 .. tsr:: Controller acceleration block
    :id: TSR_ACC_004
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_002, FSR_ACC_003
    :allocated_to: ARC_ACC_CTRL
    :asil: QM(B)
@@ -92,7 +92,7 @@ Acceleration block
 
 .. tsr:: Positive request against the block
    :id: TSR_ACC_005
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_004
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -107,7 +107,7 @@ Driver precedence and activation
 
 .. tsr:: Monitor activation record
    :id: TSR_ACC_006
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_005
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -124,7 +124,7 @@ Driver precedence and activation
 
 .. tsr:: Monitor brake pedal and CANCEL
    :id: TSR_ACC_007
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_006
    :allocated_to: ARC_ACC_MON
    :asil: B(B)
@@ -139,7 +139,7 @@ Driver precedence and activation
 
 .. tsr:: Controller brake pedal and CANCEL
    :id: TSR_ACC_008
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_006
    :allocated_to: ARC_ACC_CTRL, ARC_HMI
    :asil: QM(B)
@@ -152,7 +152,7 @@ Driver precedence and activation
 
 .. tsr:: Monitor accelerator pedal
    :id: TSR_ACC_009
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_007
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -166,7 +166,7 @@ Input integrity
 
 .. tsr:: End-to-end check of received messages
    :id: TSR_ACC_010
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_008
    :allocated_to: ARC_E2E
    :asil: B
@@ -181,7 +181,7 @@ Input integrity
 
 .. tsr:: Message age
    :id: TSR_ACC_011
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_009
    :allocated_to: ARC_RTE
    :asil: B
@@ -194,7 +194,7 @@ Input integrity
 
 .. tsr:: Monitor input faults
    :id: TSR_ACC_012
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_008, FSR_ACC_009
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -208,7 +208,7 @@ Input integrity
 
 .. tsr:: Monitor plausibility checks
    :id: TSR_ACC_013
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_010
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -224,7 +224,7 @@ Deceleration and takeover
 
 .. tsr:: Requested against measured deceleration
    :id: TSR_ACC_014
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_011
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -239,7 +239,7 @@ Deceleration and takeover
 
 .. tsr:: Monitor takeover request at short time-to-collision
    :id: TSR_ACC_015
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_012
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -254,7 +254,7 @@ Fault reaction
 
 .. tsr:: Fault latch and release
    :id: TSR_ACC_016
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_013
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -266,7 +266,7 @@ Fault reaction
 
 .. tsr:: Positive request at a fault
    :id: TSR_ACC_017
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_014
    :allocated_to: ARC_ACC_MON
    :asil: B
@@ -278,7 +278,7 @@ Fault reaction
 
 .. tsr:: Negative request at a fault
    :id: TSR_ACC_018
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_015
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -291,7 +291,7 @@ Fault reaction
 
 .. tsr:: Takeover request and mode at a fault
    :id: TSR_ACC_019
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_016
    :allocated_to: ARC_ACC_MON
    :asil: C
@@ -310,7 +310,7 @@ Output path
 
 .. tsr:: End-to-end protection of the outputs
    :id: TSR_ACC_020
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_017
    :allocated_to: ARC_E2E
    :asil: C
@@ -321,7 +321,7 @@ Output path
 
 .. tsr:: Cyclic execution of the monitor
    :id: TSR_ACC_021
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_013, FSR_ACC_017
    :allocated_to: ARC_SCHED
    :asil: C
@@ -335,7 +335,7 @@ Output path
 
 .. tsr:: Monitor outputs through the RTE
    :id: TSR_ACC_022
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_017
    :allocated_to: ARC_RTE
    :asil: C
@@ -346,7 +346,7 @@ Output path
 
 .. tsr:: Read-back of the packed command
    :id: TSR_ACC_023
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_017
    :allocated_to: ARC_E2E
    :asil: C
@@ -360,7 +360,7 @@ Output path
 
 .. tsr:: Round-trip check of received messages
    :id: TSR_ACC_024
-   :status: draft
+   :status: approved
    :derives_from: FSR_ACC_008
    :allocated_to: ARC_E2E
    :asil: B

@@ -265,7 +265,7 @@ Branch `m2-requirements`. Items marked **(pb)** are pb's alone.
       the radar accuracy (design values, margins worked in the AOUs). Checked and dropped:
       at the 2.0 s gap the block still detects scenario 14 after 0.6 s down to 25 km/h,
       because the fault's own acceleration shortens the headway
-- [ ] **(pb)** set `status: approved` on all requirements with ASIL ≥ A
+- [x] **(pb)** set `status: approved` on all requirements with ASIL ≥ A
 
 **Done when:** EARS lint passes on all requirements; no dangling links; `needflow` diagrams
 render from each safety goal down to the TSRs; the decomposition ADR records the
