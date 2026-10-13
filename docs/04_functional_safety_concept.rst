@@ -374,12 +374,29 @@ a real vehicle would have to show them.
    :derives_from: FSR_ACC_010, FSR_ACC_011
    :asil: B
 
-   The vehicle shall report ego speed within ±1 km/h and ego acceleration within
-   ±0.3 m/s² of their true values in ``VEH_Dyn``.
+   The vehicle shall report in ``VEH_Dyn`` ego speed within ±1 km/h of its true value,
+   with an error that changes by at most 0.2 km/h between consecutive messages and by at
+   most 0.5 km/h within 1 s, and ego acceleration, taken as the rate of change of ego
+   speed without the road-grade component, within ±0.3 m/s².
 
    Errors smaller than this are not detectable by the plausibility checks and are not
-   relied on. The accuracy is a design value; the tolerance of :need:`FSR_ACC_011`
-   (1.0 m/s²) is more than three times the acceleration error.
+   relied on. The accuracy is a design value, chosen so that the limits of
+   :need:`FSR_ACC_010` and :need:`FSR_ACC_011` raise no fault on correct signals:
+
+   - Ego-speed jump: 0.2 km/h of error change plus 0.36 km/h of true change at 10 m/s²
+     over 10 ms is 0.56 km/h, below the 1 km/h limit. Without the bound on the change,
+     two correct messages could differ by 2.36 km/h.
+   - Speed consistency: 0.5 km/h of error change plus 1.08 km/h from 0.3 m/s² over 1 s
+     is 1.58 km/h, below the 3 km/h limit. With independent ±1 km/h errors at both ends
+     it would be 3.08 km/h. A raw accelerometer on a 5 % grade would add 0.49 m/s²
+     (1.8 km/h over 1 s), so the grade component is excluded.
+   - Too little deceleration: the 1.0 m/s² tolerance is more than three times the
+     acceleration error.
+
+   The consistency check finds a stuck ego speed only while the vehicle accelerates or
+   decelerates by more than 0.83 m/s² (3 km/h in 1 s). A stuck speed makes the controller
+   accelerate toward the +2.0 m/s² limit, so scenario 13 runs with a set speed above the
+   stuck value.
 
 .. aou:: Radar detection
    :id: AOU_ACC_008
@@ -404,6 +421,36 @@ a real vehicle would have to show them.
 
    ADR-000 D-16 and non-goal "no stationary-object braking": stationary objects are a
    known limitation and the driver's task.
+
+.. aou:: Radar measurement accuracy
+   :id: AOU_ACC_010
+   :status: draft
+   :derives_from: FSR_ACC_002, FSR_ACC_010
+   :asil: B
+
+   The radar shall report the range of an object within ±0.5 m, its range rate within
+   ±0.1 m/s and its lateral offset within ±0.5 m of their true values, with errors that
+   change between consecutive radar cycles by at most 0.3 m in range and 0.2 m in lateral
+   offset.
+
+   A design value, chosen so that the limits of :need:`FSR_ACC_010` and the closing speed
+   of :need:`FSR_ACC_002` raise no fault and cause no flicker on correct signals:
+
+   - Range jump: at 160 km/h toward an object that has stopped, the range changes by
+     2.2 m in one 50 ms cycle; with 0.3 m of error change this is 2.5 m, below the 3 m
+     limit.
+   - Range-rate jump: a relative acceleration of 12 m/s² (lead braking at 10 m/s², ego
+     accelerating at 2 m/s²) changes the range rate by 0.6 m/s in one cycle; with 0.2 m/s
+     of error change this is 0.8 m/s, below the 2 m/s limit.
+   - Lateral jump: a cut-in at 2 m/s moves 0.1 m in one cycle; with 0.2 m of error change
+     this is 0.3 m, below the 0.5 m limit.
+   - Closing speed: the 0.5 m/s of :need:`FSR_ACC_002` is five times the range-rate error,
+     so steady following does not switch the block on and off (ADR-008).
+   - Lateral band: with the ±0.5 m error, a vehicle in the ego lane (offset up to 1 m)
+     stays inside ±2.5 m, and a vehicle centred in the adjacent lane (3.5 m) stays
+     outside it.
+
+   The M4 and M6 radar models add noise within these bounds.
 
 Unintended acceleration or braking within the limits
 ----------------------------------------------------

@@ -6,16 +6,16 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M1 done (tag `m1`); M2 in progress** on branch `m2-requirements`. Nothing in
+Status: **M1 done (tag `m1`); M2 in review** on branch `m2-requirements`. Nothing in
 this repo is a result yet.
 
-> **Next session starts here:** M2 on branch `m2-requirements`, plan in §9. Tooling is done
-> (EARS lint, trace gate v1, Graphviz). All requirement documents are drafted: `03`
-> (7 `STK_`, 37 `SYS_`), `07` (9 `ARC_`), `04` (17 `FSR_`, 9 `AOU_`), `05` (24 `TSR_`
-> with time budget); ADR-005 to ADR-008 proposed. The trace gate passes. The EARS lint
-> fails only on the `⟨pb: …⟩` values in §5 and the decomposed ASILs of ADR-006. Next: pb
-> decides ADR-005 to ADR-008 and the §5 values, then approves the requirements at
-> ASIL ≥ A.
+> **Next session starts here:** M2 on branch `m2-requirements`, plan in §9. All
+> requirement documents are drafted; pb set the §5 values and accepted ADR-005 to ADR-008
+> on 2026-10-06. EARS lint, HARA check and trace gate pass; the HTML build renders all
+> `needflow` diagrams. The consistency review of the values (§9) added the accuracy
+> assumptions `AOU_ACC_007` (changed) and `AOU_ACC_010` (new). Open: pb reviews them,
+> approves the 48 requirements at ASIL ≥ A (17 `FSR_`, 21 `TSR_`, 10 `AOU_`) and opens the
+> M2 PR.
 
 ---
 
@@ -31,7 +31,7 @@ this repo is a result yet.
 |---|---|---|---|---|
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
 | M1 | Item definition, HARA, safety goals | done | `m1` | 19 hazardous events, 4 safety goals (B / C / B / B); ADR-003, ADR-004 |
-| M2 | Requirements and safety concepts | in progress | — | EARS lint, trace gate v1, decomposition ADR |
+| M2 | Requirements and safety concepts | in review | — | 7 `STK_`, 37 `SYS_`, 17 `FSR_`, 24 `TSR_`, 10 `AOU_`; EARS lint, trace gate v1; ADR-005 to ADR-008 |
 | M3 | SysML v2 architecture | not started | — | |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
 | M5 | Software requirements and embedded C | not started | — | |
@@ -75,15 +75,15 @@ that remain.
 | S/E/C ratings with rationale, ASIL per hazardous event | M1 | done (approved) |
 | Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | done (approved) |
 | FTTI hazard criterion and assumed FTTI (before the MIL run) | M4 | open |
-| Block condition of checker rule 2: lateral band, `T_ttc`, `T_thw`, `v_close` (ADR-008) | M2 | open |
-| `AccMon` block hold time `T_hold` | M2 | open |
-| Plausibility jump limits and speed consistency limit (checker rule 4) | M2 | open |
-| E2E consecutive-error count `N_e2e` (default 3) | M2 | open |
-| ASIL of `TgtSel` and the decomposition of `AccCtrl` / `AccMon` (ADR-006) | M2 | open |
-| Tolerance `a_tol` and duration `t_tol` between requested and measured acceleration (detects too little deceleration, ADR-003) | M2 | open |
-| TTC threshold `T_tor` for the takeover request at short time-to-collision | M2 | open |
-| TOR display latency (cluster assumption of use) | M2 | open |
-| Unintended braking within A-05 is controllable (draft argument in `04`) | M2 | open |
+| Block condition of checker rule 2: lateral band, `T_ttc`, `T_thw`, `v_close` (ADR-008) | M2 | done: ±2.5 m, 4.0 s, 2.5 s, 0.5 m/s |
+| `AccMon` block hold time `T_hold` | M2 | done: 500 ms |
+| Plausibility jump limits and speed consistency limit (checker rule 4) | M2 | done: 1 km/h, 3 m, 2 m/s, 0.5 m; 3 km/h over 1 s |
+| E2E consecutive-error count `N_e2e` (default 3) | M2 | done: 3 |
+| ASIL of `TgtSel` and the decomposition of `AccCtrl` / `AccMon` (ADR-006) | M2 | done: option 2 |
+| Tolerance `a_tol` and duration `t_tol` between requested and measured acceleration (detects too little deceleration, ADR-003) | M2 | done: 1.0 m/s², 500 ms |
+| TTC threshold `T_tor` for the takeover request at short time-to-collision | M2 | done: 3.0 s |
+| TOR display latency (cluster assumption of use) | M2 | done: 200 ms |
+| Unintended braking within A-05 is controllable (draft argument in `04`) | M2 | done: confirmed; M4 checks it |
 
 ## 6. Environment facts (checked 2026-09-29, updated 2026-10-06)
 
@@ -253,10 +253,18 @@ Branch `m2-requirements`. Items marked **(pb)** are pb's alone.
       COM packing sits inside the E2E boundary, so read-back checks are proposed
 - [x] **ADR-008** (proposed) block condition of checker rule 2: TTC alone detects the
       scenario-14 fault in steady following too late; TTC or short headway while closing
-- [ ] **(pb)** accept or change ADR-005 to ADR-008
+- [x] **(pb)** accept or change ADR-005 to ADR-008: all four accepted as proposed
 
 **pb**
-- [ ] **(pb)** values in §5 marked M2 (proposed with reasoning, written in by pb)
+- [x] **(pb)** values in §5 marked M2 (proposed with reasoning, written in by pb)
+- [x] Consistency review of the §5 values: the time budget holds (largest total 760 ms
+      against 1000 ms). The jump and consistency limits of `FSR_ACC_010` could fail on
+      correct signals with the old `AOU_ACC_007`, and no radar accuracy was assumed. Fixed
+      without changing pb's values: `AOU_ACC_007` bounds how fast the ego-speed error
+      changes and excludes the road grade from ego acceleration; new `AOU_ACC_010` states
+      the radar accuracy (design values, margins worked in the AOUs). Checked and dropped:
+      at the 2.0 s gap the block still detects scenario 14 after 0.6 s down to 25 km/h,
+      because the fault's own acceleration shortens the headway
 - [ ] **(pb)** set `status: approved` on all requirements with ASIL ≥ A
 
 **Done when:** EARS lint passes on all requirements; no dangling links; `needflow` diagrams
