@@ -6,12 +6,13 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M2 done (tag `m2`); M3 in progress** on branch `m3-sysml`. Nothing in this
+Status: **M2 done (tag `m2`); M3 in review** on branch `m3-sysml`. Nothing in this
 repo is a result yet.
 
 > **Next session starts here:** M3 on branch `m3-sysml`, plan in §10. Model, check, views
-> and ADR-009 are drafted and pass locally. Open: pb reviews ADR-009 (including the FAULT
-> exit finding), runs the broken-ID demonstration in CI and opens the M3 PR.
+> and ADR-009 (accepted) are in; the broken-ID demonstration failed in CI as intended.
+> Open: pb merges the M3 PR and tags `m3`. M4 (MIL) starts with the FTTI hazard criterion,
+> which pb writes before the run (§5), and tests the FAULT exit of ADR-009.
 
 ---
 
@@ -28,7 +29,7 @@ repo is a result yet.
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
 | M1 | Item definition, HARA, safety goals | done | `m1` | 19 hazardous events, 4 safety goals (B / C / B / B); ADR-003, ADR-004 |
 | M2 | Requirements and safety concepts | done | `m2` | 7 `STK_`, 37 `SYS_`, 17 `FSR_`, 24 `TSR_`, 10 `AOU_`; EARS lint, trace gate v1; ADR-005 to ADR-008 |
-| M3 | SysML v2 architecture | in progress | — | Model, `sysml_check.py`, views in `07`; ADR-009 |
+| M3 | SysML v2 architecture | in review | — | Model, `sysml_check.py`, views in `07`; ADR-009 |
 | M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
 | M5 | Software requirements and embedded C | not started | — | |
 | M6 | SIL, back-to-back, fault injection | not started | — | Trace gate strict |
@@ -308,9 +309,14 @@ Brief §12 M3, refined by ADR-000 D-11, D-14 and ADR-001. Branch `m3-sysml`. Ite
       the model (`AccCtrl` follows the monitor's release)
 
 **pb**
-- [ ] **(pb)** accept or change ADR-009
-- [ ] **(pb)** push a commit with a deliberately broken ID, confirm CI fails, then revert
-      (brief *Done when*)
+- [x] **(pb)** accept or change ADR-009: accepted as proposed (2026-10-14), including the
+      FAULT exit and the allocation rule in both directions
+- [x] **(pb)** push a commit with a deliberately broken ID, confirm CI fails, then revert
+      (brief *Done when*). `41de707` changes `TSR_ACC_003` to `TSR_ACC_903` in the model.
+      On `m3-sysml` its run 38448541179 was cancelled by the revert pushed 11 s later
+      (`cancel-in-progress`), so the same commit was pushed to `m3-broken-id-demo`: run
+      38533079658 failed in `docs-trace-gate` at "SysML model check and views (ADR-009)",
+      all other jobs passed. Revert `404a18e`: run 38448566028 green
 
 **Done when:** the model parses (ADR-001); rendered views (structure, state machine)
 appear in `07_architecture.rst`; the consistency check runs in CI and failed once on a

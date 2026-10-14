@@ -1,8 +1,8 @@
 # ADR-009 — SysML v2 model conventions and the model check
 
-- **Status:** proposed
-- **Date:** 2026-10-13 (proposed)
-- **Decided by:** pb (pending)
+- **Status:** accepted
+- **Date:** 2026-10-13 (proposed), 2026-10-14 (accepted)
+- **Decided by:** pb
 - **Relates to:** brief §5, §6.3, §12 M3; [ADR-000](ADR-000-project-setup.md) D-11, D-14, D-19;
   [ADR-001](ADR-001-sysml-v2-parsing-in-ci.md); [ADR-005](ADR-005-ears-lint-and-trace-gate.md);
   docs `07_architecture`
