@@ -452,11 +452,25 @@ a real vehicle would have to show them.
 
    The M4 and M6 radar models add noise within these bounds.
 
+.. aou:: Brake lights with ACC braking
+   :id: AOU_ACC_011
+   :status: draft
+   :derives_from: FSR_ACC_001
+   :asil: C
+
+   When ``ACC_Cmd`` carries a negative acceleration request with the request active flag
+   set, the vehicle shall switch on the brake lights within 50 ms.
+
+   The braking argument below relies on following traffic being warned at the start of
+   the braking, also while the vehicle still decelerates on engine drag alone. The 50 ms
+   is the dead time of A-10. ADR-010 shows the sensitivity: with the brake lights on only
+   above 0.5 m/s² of deceleration, a follower braking at 3.5 m/s² would collide.
+
 Unintended acceleration or braking within the limits
 ----------------------------------------------------
 
 *Argument confirmed by pb on 2026-10-06 (ADR-003, consequences); the M4 MIL run checks
-the braking claim with a follower model.*
+the braking claim with a follower model, set up in ADR-010 (Experiment B) before the run.*
 
 The limit check (:need:`FSR_ACC_001`) removes requests beyond +2.0 and −3.5 m/s² and
 steps faster than 2.5 m/s³. A wrong request **within** these limits cannot be told apart
@@ -464,12 +478,13 @@ from correct control by a limit check. It remains, and is argued as follows.
 
 - **Braking within A-05 and A-06** (``SG_ACC_002``, ``HE_OS2_M2`` rated C3 at −8 m/s²).
   The deceleration builds at no more than 2.5 m/s³, so reaching −3.5 m/s² takes at least
-  1.4 s plus the actuator response, and the brake lights come on at the start. This is
+  1.4 s plus the actuator response, and the brake lights come on at the start
+  (:need:`AOU_ACC_011`). This is
   the profile of a normal ACC braking, which following traffic meets every day. The
   driver ends it with the accelerator (:need:`FSR_ACC_007`) or CANCEL
   (:need:`FSR_ACC_006`). The claim: with this build-up, a follower at a 1 s gap and
-  1.5 s reaction time does not collide, so the remainder is controllable (C1 or better)
-  rather than C3.
+  1.5 s reaction time that brakes at 3.5 m/s² does not collide, so the remainder is
+  controllable (C1 or better) rather than C3.
 - **Acceleration within A-04** (``SG_ACC_001``). Without a vehicle ahead (``HE_OS1_M1``,
   ASIL A), +2 m/s² beyond the set speed is felt and seen on the speedometer. Once a
   vehicle comes within range, :need:`FSR_ACC_002` blocks it and :need:`FSR_ACC_004` raises

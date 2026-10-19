@@ -6,13 +6,12 @@ decisions that refine or change the brief are recorded as ADRs in
 [docs/decisions/](docs/decisions/). Setup decisions from the pre-M0 review:
 [ADR-000](docs/decisions/ADR-000-project-setup.md).
 
-Status: **M2 done (tag `m2`); M3 in review** on branch `m3-sysml`. Nothing in this
+Status: **M3 done (tag `m3`); M4 in progress** on branch `m4-mil`. Nothing in this
 repo is a result yet.
 
-> **Next session starts here:** M3 on branch `m3-sysml`, plan in §10. Model, check, views
-> and ADR-009 (accepted) are in; the broken-ID demonstration failed in CI as intended.
-> Open: pb merges the M3 PR and tags `m3`. M4 (MIL) starts with the FTTI hazard criterion,
-> which pb writes before the run (§5), and tests the FAULT exit of ADR-009.
+> **Next session starts here:** M4 on branch `m4-mil`, plan in §11. ADR-010 (accepted)
+> fixes both MIL experiments before the run and adds `AOU_ACC_011` (draft). Next: the
+> simulation in `sim/`, then the reference controller.
 
 ---
 
@@ -29,8 +28,8 @@ repo is a result yet.
 | M0 | Scaffold and feasibility spikes | done | `m0` | Docker image, CI skeleton, ADR-001 (SysML spike), ADR-002 (vcan spike) |
 | M1 | Item definition, HARA, safety goals | done | `m1` | 19 hazardous events, 4 safety goals (B / C / B / B); ADR-003, ADR-004 |
 | M2 | Requirements and safety concepts | done | `m2` | 7 `STK_`, 37 `SYS_`, 17 `FSR_`, 24 `TSR_`, 10 `AOU_`; EARS lint, trace gate v1; ADR-005 to ADR-008 |
-| M3 | SysML v2 architecture | in review | — | Model, `sysml_check.py`, views in `07`; ADR-009 |
-| M4 | MIL | not started | — | Gain tuning ADR, FTTI experiment ADR (criterion written **before** the run) |
+| M3 | SysML v2 architecture | done | `m3` | Model, `sysml_check.py`, views in `07`; ADR-009 |
+| M4 | MIL | in progress | — | ADR-010 experiments fixed before the run; gain tuning ADR |
 | M5 | Software requirements and embedded C | not started | — | |
 | M6 | SIL, back-to-back, fault injection | not started | — | Trace gate strict |
 | M7 | Verification report, safety case, ASPICE mapping, README | not started | — | |
@@ -71,7 +70,8 @@ that remain.
 |---|---|---|
 | S/E/C ratings with rationale, ASIL per hazardous event | M1 | done (approved) |
 | Safety goals: safe state (initial proposal in brief §5.4), FTTI | M1 | done (approved) |
-| FTTI hazard criterion and assumed FTTI (before the MIL run) | M4 | open |
+| FTTI hazard criterion and assumed FTTI (before the MIL run) | M4 | done: time headway < 0.5 s, +3.0 m/s² (+2.0 reported), FTTI 1000 ms (ADR-010) |
+| Follower check of the braking argument: follower braking, brake lights (ADR-010) | M4 | done: 3.5 m/s² after 1.5 s at 10 m/s³; brake lights with ACC braking (`AOU_ACC_011`, draft) |
 | Block condition of checker rule 2: lateral band, `T_ttc`, `T_thw`, `v_close` (ADR-008) | M2 | done: ±2.5 m, 4.0 s, 2.5 s, 0.5 m/s |
 | `AccMon` block hold time `T_hold` | M2 | done: 500 ms |
 | Plausibility jump limits and speed consistency limit (checker rule 4) | M2 | done: 1 km/h, 3 m, 2 m/s, 0.5 m; 3 km/h over 1 s |
@@ -321,3 +321,59 @@ Brief §12 M3, refined by ADR-000 D-11, D-14 and ADR-001. Branch `m3-sysml`. Ite
 **Done when:** the model parses (ADR-001); rendered views (structure, state machine)
 appear in `07_architecture.rst`; the consistency check runs in CI and failed once on a
 deliberately broken ID, then passed after the revert; CI green; pb merges and tags `m3`.
+
+M3 closed 2026-10-19: PR #4 merged as `189a4b0`, tagged `m3`. CI run 39237853270 on `main`
+green.
+
+## 11. M4 plan
+
+Brief §12 M4, refined by ADR-000 D-03, D-11 to D-16, D-22 and ADR-010. Branch `m4-mil`.
+Items marked **(pb)** are pb's alone.
+
+**Before the run**
+- [x] PLAN.md: close M3, M4 plan (first commit on the branch)
+- [x] **ADR-010** (accepted by pb before any MIL code): set-up, hazard criterion and
+      assumed FTTI of Experiment A (FTTI of `SG_ACC_001`); set-up and pass criterion of
+      Experiment B (follower check of the braking argument in `04`); new `AOU_ACC_011`
+      (brake lights with ACC braking, draft)
+
+**Simulation** (`sim/`, Python, deterministic, 10 ms lockstep)
+- [ ] Plant: longitudinal ego dynamics, A-10 actuator response, driving resistances,
+      receiver check of `ACC_Cmd` and request active flag (`AOU_ACC_004`, `AOU_ACC_005`),
+      brake lights (`AOU_ACC_011`)
+- [ ] Traffic: scripted lead profiles, cut-in, cut-out, follower (Experiment B)
+- [ ] Sensors: radar model (50 ms, 150 m, 4 objects, moving objects only, noise within
+      `AOU_ACC_010`, dropouts); `VEH_Dyn` within `AOU_ACC_007`; `HMI_Btn` at 20 ms
+- [ ] Message layer: alive counter, E2E check result, error count and message age per
+      message, as the RTE inputs of D-14; fault injector (CRC, frozen and skipped counter,
+      drop, stuck value, out of range, NaN, forced controller output)
+- [ ] ADR-011 MIL harness and model decisions (E2E modelled at the check-result level
+      until the DBC exists in M5, radar noise model, time base)
+
+**Reference controller** (`sim/mil_controller/`, float32, D-14 order)
+- [ ] `Hmi`, `TgtSel`, `AccCtrl` (mode table of `AccModes.sysml`, ADR-009 FAULT exit,
+      control law of brief §5.3), `AccMon` (`TSR_ACC_002` to `TSR_ACC_019`)
+- [ ] Per-tick record of the full RTE input vector and the outputs (D-22, for M6)
+
+**Scenarios and tests**
+- [ ] 14 scenarios in `sim/scenarios/` (YAML) plus variants (each time gap; CRC, frozen
+      and skipped counter; scenario-14 dropout), pass criteria naming requirement IDs;
+      runner, KPIs (brief §7.3), plots into the docs build
+- [ ] `08_verification_plan.rst`: one `TC_` per scenario, `level: mil`, verifying its
+      `SYS_` / `FSR_` / `TSR_` / `AOU_`
+- [ ] pytest in `tests/mil/` with `@pytest.mark.tc`; `mil` CI job runs it and hands plots
+      and results to `docs-trace-gate`
+- [ ] **ADR-012** gain tuning: gains, tuning scenarios, confirmation of the ±10 % of
+      `SYS_ACC_028`
+
+**Experiments** (ADR-010)
+- [ ] Experiment A and scenario 14 against the FTTI; Experiment B; results from the
+      generated artefacts into ADR-010; `SG_ACC_001` changed only by a new ADR
+
+**pb**
+- [ ] **(pb)** approve `AOU_ACC_011` (ASIL C)
+- [ ] **(pb)** accept or change ADR-011 and ADR-012
+
+**Done when:** all 14 scenarios run in MIL; each has pass/fail against its traced
+criteria; plots are generated into the docs build; the FTTI ADR shows assumed vs measured;
+safety goals are updated if needed (with ADR); CI green; pb merges and tags `m4`.
