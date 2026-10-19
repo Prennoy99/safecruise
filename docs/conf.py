@@ -89,3 +89,15 @@ needs_build_json = True
 # Trace diagrams (needflow) are drawn with Graphviz `dot` from the toolchain image (ADR-005).
 needs_flow_engine = "graphviz"
 graphviz_output_format = "svg"
+
+
+# The SysML views in 07_architecture are rendered by tools/sysml_check.py, which needs
+# needs.json first (ADR-009). The needs builder writes no images, so it may run before the
+# views exist; the HTML build still fails on a missing view.
+def _needs_builder_ignores_images(app) -> None:
+    if app.builder.name == "needs":
+        app.config.suppress_warnings = [*app.config.suppress_warnings, "image.not_readable"]
+
+
+def setup(app):
+    app.connect("builder-inited", _needs_builder_ignores_images)

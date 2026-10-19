@@ -49,13 +49,15 @@ docker build --network=host -t safecruise-dev .
 docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD":/work safecruise-dev sh -c '
   cmake --preset gcc14 && cmake --build --preset gcc14 && ctest --preset gcc14 &&
   pytest &&
-  sphinx-build -b html -W docs build/docs/html &&
-  sphinx-build -b needs -W docs build/docs/needs'
+  sphinx-build -b needs -W docs build/docs/needs &&
+  python tools/sysml_check.py build/docs/needs/needs.json --views build/sysml/views &&
+  sphinx-build -b html -W docs build/docs/html'
 ```
 
 The second command builds the C code and runs every test: Unity unit tests through CTest,
-then pytest (tooling and requirements-database checks, SysML v2 parsing), then the docs and
-the requirements export (`build/docs/needs/needs.json`). CI runs the same steps in the same
+then pytest (tooling and requirements-database checks, SysML v2 parsing). It then exports
+the requirements (`build/docs/needs/needs.json`), checks the SysML v2 model against them and
+renders its views, and builds the docs, which show those views. CI runs the same steps in the same
 image ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
 ## Repository layout
